@@ -24,6 +24,7 @@
         <mapping class="fr.insalyon.creatis.moteur.plugins.workflowsdb.bean.InputID"/>
         <mapping class="fr.insalyon.creatis.moteur.plugins.workflowsdb.bean.Output"/>
         <mapping class="fr.insalyon.creatis.moteur.plugins.workflowsdb.bean.OutputID"/>
+        <mapping class="fr.insalyon.creatis.moteur.plugins.workflowsdb.bean.Stats"/>
         
     </session-factory>
 </hibernate-configuration> 

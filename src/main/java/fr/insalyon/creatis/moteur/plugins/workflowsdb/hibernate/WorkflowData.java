@@ -104,6 +104,23 @@ public class WorkflowData implements WorkflowDAO {
     }
 
     @Override
+    public void removeById(String id) throws WorkflowsDBDAOException {
+
+        try {
+            Session session = sessionFactory.openSession();
+            session.beginTransaction();
+            session.getNamedQuery("Workflows.removeById")
+                    .setString("id", id)
+                    .executeUpdate();
+            session.getTransaction().commit();
+            session.close();
+
+        } catch (HibernateException ex) {
+            throw new WorkflowsDBDAOException(ex);
+        }
+    }
+
+    @Override
     public List<Workflow> get() throws WorkflowsDBDAOException {
 
         try {
@@ -278,23 +295,6 @@ public class WorkflowData implements WorkflowDAO {
             session.close();
 
             return running;
-
-        } catch (HibernateException ex) {
-            throw new WorkflowsDBDAOException(ex);
-        }
-    }
-
-    @Override
-    public void removeById(String id) throws WorkflowsDBDAOException {
-
-        try {
-            Session session = sessionFactory.openSession();
-            session.beginTransaction();
-            session.getNamedQuery("Workflows.removeById")
-                    .setString("id", id)
-                    .executeUpdate();
-            session.getTransaction().commit();
-            session.close();
 
         } catch (HibernateException ex) {
             throw new WorkflowsDBDAOException(ex);

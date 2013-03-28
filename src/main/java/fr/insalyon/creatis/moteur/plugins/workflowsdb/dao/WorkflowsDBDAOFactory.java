@@ -39,10 +39,12 @@ import fr.insalyon.creatis.moteur.plugins.workflowsdb.bean.Output;
 import fr.insalyon.creatis.moteur.plugins.workflowsdb.bean.OutputID;
 import fr.insalyon.creatis.moteur.plugins.workflowsdb.bean.Processor;
 import fr.insalyon.creatis.moteur.plugins.workflowsdb.bean.ProcessorID;
+import fr.insalyon.creatis.moteur.plugins.workflowsdb.bean.Stats;
 import fr.insalyon.creatis.moteur.plugins.workflowsdb.bean.Workflow;
 import fr.insalyon.creatis.moteur.plugins.workflowsdb.hibernate.InputData;
 import fr.insalyon.creatis.moteur.plugins.workflowsdb.hibernate.OutputData;
 import fr.insalyon.creatis.moteur.plugins.workflowsdb.hibernate.ProcessorData;
+import fr.insalyon.creatis.moteur.plugins.workflowsdb.hibernate.StatsData;
 import fr.insalyon.creatis.moteur.plugins.workflowsdb.hibernate.WorkflowData;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
@@ -90,7 +92,8 @@ public class WorkflowsDBDAOFactory {
             cfg.addAnnotatedClass(InputID.class);
             cfg.addAnnotatedClass(Output.class);
             cfg.addAnnotatedClass(OutputID.class);
-            
+            cfg.addAnnotatedClass(Stats.class);
+
             ServiceRegistry serviceRegistry = new ServiceRegistryBuilder().applySettings(cfg.getProperties()).buildServiceRegistry();
             this.sessionFactory = cfg.buildSessionFactory(serviceRegistry);
 
@@ -101,6 +104,10 @@ public class WorkflowsDBDAOFactory {
 
     public void close() {
         sessionFactory.close();
+    }
+
+    public SessionFactory getSessionFactory() {
+        return sessionFactory;
     }
 
     public WorkflowDAO getWorkflowDAO() {
@@ -117,5 +124,9 @@ public class WorkflowsDBDAOFactory {
 
     public OutputDAO getOutputDAO() {
         return new OutputData(sessionFactory);
+    }
+
+    public StatsDAO getStatsDAO() {
+        return new StatsData(sessionFactory);
     }
 }
