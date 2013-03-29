@@ -53,7 +53,7 @@ import javax.persistence.TemporalType;
     @NamedQuery(name = "Workflows.findAll", query = "FROM Workflow w ORDER BY w.startedTime DESC"),
     @NamedQuery(name = "Workflows.findById", query = "FROM Workflow w WHERE w.id = :id"),
     @NamedQuery(name = "Workflows.findByUser", query = "FROM Workflow w WHERE w.username = :username ORDER BY w.startedTime DESC"),
-    @NamedQuery(name = "Workflows.NumberOfRunning", query = "SELECT COUNT(id) FROM Workflow w WHERE w.username = :username"),
+    @NamedQuery(name = "Workflows.NumberOfRunning", query = "SELECT COUNT(id) FROM Workflow w WHERE w.username = :username AND w.status = :status"),
     @NamedQuery(name = "Workflows.getRunning", query = "FROM Workflow w WHERE w.status = :status ORDER BY w.startedTime DESC"),
     @NamedQuery(name = "Workflows.removeById", query = "DELETE FROM Workflow w WHERE w.id = :id"),
     @NamedQuery(name = "Workflows.updateUser", query = "UPDATE Workflow w SET w.username = :newUser WHERE w.username = :currentUser"),

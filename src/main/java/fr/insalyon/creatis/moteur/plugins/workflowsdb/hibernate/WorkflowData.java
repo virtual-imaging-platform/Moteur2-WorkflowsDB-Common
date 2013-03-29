@@ -290,6 +290,7 @@ public class WorkflowData implements WorkflowDAO {
             session.beginTransaction();
             Long running = (Long) session.getNamedQuery("Workflows.NumberOfRunning")
                     .setString("username", username)
+                    .setString("status", WorkflowStatus.Running.name())
                     .uniqueResult();
             session.getTransaction().commit();
             session.close();
