@@ -168,8 +168,9 @@ public class WorkflowData implements WorkflowDAO {
             if (username != null) {
                 criteria.add(Restrictions.eq("username", username));
             }
+            if(startedTime!=null)
             if (startedTime != null) {
-                criteria.add(Restrictions.ge("startedTime", startedTime));
+                criteria.add(Restrictions.lt("startedTime", startedTime));
             }
             criteria.addOrder(Order.desc("startedTime"));
             criteria.setMaxResults(10);
