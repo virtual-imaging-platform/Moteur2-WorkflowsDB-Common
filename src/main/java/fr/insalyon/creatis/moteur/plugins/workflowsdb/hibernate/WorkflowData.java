@@ -36,6 +36,7 @@ import fr.insalyon.creatis.moteur.plugins.workflowsdb.bean.Workflow;
 import fr.insalyon.creatis.moteur.plugins.workflowsdb.bean.WorkflowStatus;
 import fr.insalyon.creatis.moteur.plugins.workflowsdb.dao.WorkflowDAO;
 import fr.insalyon.creatis.moteur.plugins.workflowsdb.dao.WorkflowsDBDAOException;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import org.hibernate.Criteria;
@@ -43,6 +44,7 @@ import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.criterion.Order;
+import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 
 /**
@@ -188,7 +190,7 @@ public class WorkflowData implements WorkflowDAO {
 
     @Override
     public List<Workflow> get(String username, String applicationName,
-            WorkflowStatus status, Date startDate, Date endDate)
+            WorkflowStatus status, String applicationClass, Date startDate, Date endDate)
             throws WorkflowsDBDAOException {
 
         try {
@@ -204,6 +206,9 @@ public class WorkflowData implements WorkflowDAO {
             }
             if (status != null) {
                 criteria.add(Restrictions.eq("status", status));
+            }
+            if (applicationClass != null) {
+                criteria.add(Restrictions.eq("applicationClass", applicationClass));
             }
             if (startDate != null) {
                 criteria.add(Restrictions.ge("startedTime", startDate));
@@ -226,7 +231,7 @@ public class WorkflowData implements WorkflowDAO {
 
     @Override
     public List<Workflow> get(List<String> usersList, String applicationName,
-            WorkflowStatus status, Date startDate, Date endDate)
+            WorkflowStatus status, String applicationClass, Date startDate, Date endDate)
             throws WorkflowsDBDAOException {
 
         try {
@@ -244,6 +249,9 @@ public class WorkflowData implements WorkflowDAO {
             }
             if (status != null) {
                 criteria.add(Restrictions.eq("status", status));
+            }
+            if (applicationClass != null) {
+                criteria.add(Restrictions.eq("applicationClass", applicationClass));
             }
             if (startDate != null) {
                 criteria.add(Restrictions.ge("startedTime", startDate));

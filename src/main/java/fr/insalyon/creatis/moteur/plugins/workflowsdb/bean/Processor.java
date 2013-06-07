@@ -47,7 +47,7 @@ import javax.persistence.Table;
 @NamedQueries({
     @NamedQuery(name = "Processors.findById", query = "FROM Processor p WHERE p.processorID.workflowID = :workflowID"),
     @NamedQuery(name = "Processors.findByIdAndProcessor", query = "FROM Processor p WHERE p.processorID.workflowID = :workflowID AND p.processorID.processor = :processor"),
-    @NamedQuery(name = "Processors.removeById", query = "DELETE FROM Processor p WHERE p.processorID.workflowID = :workflowID"),})
+    @NamedQuery(name = "Processors.removeById", query = "DELETE FROM Processor p WHERE p.processorID.workflowID = :workflowID")})
 @Table(name = "Processors")
 public class Processor {
 

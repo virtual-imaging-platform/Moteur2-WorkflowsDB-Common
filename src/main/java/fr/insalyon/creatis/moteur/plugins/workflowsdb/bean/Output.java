@@ -48,7 +48,7 @@ import javax.persistence.Table;
 @Entity
 @NamedQueries({
     @NamedQuery(name = "Outputs.findById", query = "FROM Output o WHERE o.outputID.workflowID = :workflowID"),
-    @NamedQuery(name = "Outputs.deleteById", query = "DELETE FROM Output o WHERE o.outputID.workflowID = :workflowID"),
+    @NamedQuery(name = "Outputs.deleteById", query = "DELETE FROM Output o WHERE o.outputID.workflowID = :workflowID")
 })
 @Table(name = "Outputs")
 public class Output {
