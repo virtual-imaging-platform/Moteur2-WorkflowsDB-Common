@@ -15,6 +15,13 @@
         <property name="format_sql">true</property>
         <property name="use_sql_comments">true</property>
         <property name="hbm2ddl.auto">update</property>
+        <property name="c3p0.min_size">5</property>
+        <property name="c3p0.max_size">20</property>
+        <property name="c3p0.timeout">1800</property>
+        <property name="c3p0.max_statements">50</property>
+        <property name="connection.provider_class">
+            org.hibernate.connection.C3P0ConnectionProvider
+        </property>
         
         <!-- Mapped entities -->
         <mapping class="fr.insalyon.creatis.moteur.plugins.workflowsdb.bean.Workflow"/>
