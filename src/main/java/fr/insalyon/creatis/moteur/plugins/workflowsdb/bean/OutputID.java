@@ -65,7 +65,7 @@ public class OutputID implements Serializable {
         this.workflowID = workflowID;
     }
 
-    @Column(name = "path")
+    @Column(name = "path", length = 400)
     public String getPath() {
         return path;
     }
