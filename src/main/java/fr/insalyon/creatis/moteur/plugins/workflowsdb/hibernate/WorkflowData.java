@@ -43,6 +43,8 @@ import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.hibernate.criterion.Junction;
+import org.hibernate.criterion.LogicalExpression;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
@@ -240,9 +242,11 @@ public class WorkflowData implements WorkflowDAO {
             Criteria criteria = session.createCriteria(Workflow.class);
 
             if (usersList != null && !usersList.isEmpty()) {
+                Junction junction = Restrictions.disjunction();
                 for (String username : usersList) {
-                    criteria.add(Restrictions.eq("username", username));
+                    junction.add(Restrictions.eq("username", username));
                 }
+                criteria.add(junction);
             }
             if (applicationName != null) {
                 criteria.add(Restrictions.eq("application", applicationName));
