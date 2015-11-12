@@ -173,4 +173,17 @@ public class Workflow {
     public void setApplicationClass(String applicationClass) {
         this.applicationClass = applicationClass;
     }
+    
+    public String toString(){
+      return "id: "+id+
+             "username: "+username+
+             ", status: "+status.toString()+
+             ", startedTime: "+startedTime.toString()+
+             ", finishedTieme: "+(finishedTime == null ? "" : finishedTime.toString())+
+             ", description: "+description+
+             ", application: "+application+
+             ", applicationVersion: "+applicationVersion+
+             ", applicationClass: "+applicationClass;
+    }
+    
 }
