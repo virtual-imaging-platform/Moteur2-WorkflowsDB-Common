@@ -62,6 +62,8 @@ public interface WorkflowDAO {
     public List<Workflow> getByUsername(String username) throws WorkflowsDBDAOException;
 
     public long getNumberOfRunning(String username) throws WorkflowsDBDAOException;
+    
+    public long getNumberOfRunningPerEngine(String engine) throws WorkflowsDBDAOException;
 
     public List<Workflow> getRunning() throws WorkflowsDBDAOException;
 

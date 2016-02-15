@@ -54,6 +54,7 @@ import javax.persistence.TemporalType;
     @NamedQuery(name = "Workflows.findById", query = "FROM Workflow w WHERE w.id = :id"),
     @NamedQuery(name = "Workflows.findByUser", query = "FROM Workflow w WHERE w.username = :username ORDER BY w.startedTime DESC"),
     @NamedQuery(name = "Workflows.NumberOfRunning", query = "SELECT COUNT(id) FROM Workflow w WHERE w.username = :username AND w.status = :status"),
+    @NamedQuery(name = "Workflows.NumberOfRunningPerEngine", query = "SELECT COUNT(id) FROM Workflow w WHERE w.engine = :engine AND w.status = :status"),
     @NamedQuery(name = "Workflows.getRunning", query = "FROM Workflow w WHERE w.status = :status ORDER BY w.startedTime DESC"),
     @NamedQuery(name = "Workflows.removeById", query = "DELETE FROM Workflow w WHERE w.id = :id"),
     @NamedQuery(name = "Workflows.updateUser", query = "UPDATE Workflow w SET w.username = :newUser WHERE w.username = :currentUser")
@@ -70,13 +71,14 @@ public class Workflow {
     private String application;
     private String applicationVersion;
     private String applicationClass;
+    private String engine;
 
     public Workflow() {
     }
 
     public Workflow(String id, String username, WorkflowStatus status,
             Date startedTime, Date finishedTime, String description,
-            String application, String applicationVersion, String applicationClass) {
+            String application, String applicationVersion, String applicationClass, String engine) {
 
         this.id = id;
         this.username = username;
@@ -87,6 +89,7 @@ public class Workflow {
         this.application = application;
         this.applicationVersion = applicationVersion;
         this.applicationClass = applicationClass;
+        this.engine = engine;
     }
 
     @Id
@@ -173,6 +176,15 @@ public class Workflow {
     public void setApplicationClass(String applicationClass) {
         this.applicationClass = applicationClass;
     }
+      
+    @Column(name = "engine")
+    public String getEngine() {
+        return engine;
+    }
+
+    public void setEngine(String engine) {
+        this.engine = engine;
+    }
     
     public String toString(){
       return "id: "+id+
@@ -183,7 +195,8 @@ public class Workflow {
              ", description: "+description+
              ", application: "+application+
              ", applicationVersion: "+applicationVersion+
-             ", applicationClass: "+applicationClass;
+             ", applicationClass: "+applicationClass+
+             ", engine: "+engine;
     }
     
 }

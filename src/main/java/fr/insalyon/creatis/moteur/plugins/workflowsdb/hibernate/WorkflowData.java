@@ -311,7 +311,27 @@ public class WorkflowData implements WorkflowDAO {
             throw new WorkflowsDBDAOException(ex);
         }
     }
+    
+    @Override
+    public long getNumberOfRunningPerEngine(String engine) throws WorkflowsDBDAOException {
 
+        try {
+            Session session = sessionFactory.openSession();
+            session.beginTransaction();
+            Long running = (Long) session.getNamedQuery("Workflows.NumberOfRunningPerEngine")
+                    .setString("engine", engine)
+                    .setString("status", WorkflowStatus.Running.name())
+                    .uniqueResult();
+            session.getTransaction().commit();
+            session.close();
+
+            return running;
+
+        } catch (HibernateException ex) {
+            throw new WorkflowsDBDAOException(ex);
+        }
+    }
+    
     @Override
     public void updateUsername(String newUser, String currentUser) throws WorkflowsDBDAOException {
 
