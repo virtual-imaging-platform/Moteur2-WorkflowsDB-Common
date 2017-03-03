@@ -62,7 +62,11 @@ public class PluginConfiguration {
     private PluginConfiguration() throws WorkflowsDBException {
 
         try {
-            File configFile = new File(System.getProperty("user.home") + "/.moteur2/moteur2plugins.conf");
+            File cfgFileDir = new File(System.getProperty("user.home") + "/.moteur2");
+            if (!cfgFileDir.exists()) {
+                cfgFileDir.mkdirs();
+            }
+            File configFile = new File(cfgFileDir, "moteur2plugins.conf");
             if (!configFile.exists()) {
                 configFile.createNewFile();
             }
