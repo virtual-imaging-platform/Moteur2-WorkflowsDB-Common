@@ -57,19 +57,9 @@ import org.hibernate.service.ServiceRegistryBuilder;
  */
 public class WorkflowsDBDAOFactory {
 
-    private static WorkflowsDBDAOFactory instance;
     private SessionFactory sessionFactory;
 
-    public static WorkflowsDBDAOFactory getInstance() throws WorkflowsDBDAOException {
-
-        if (instance == null) {
-            instance = new WorkflowsDBDAOFactory();
-        }
-
-        return instance;
-    }
-
-    private WorkflowsDBDAOFactory() throws WorkflowsDBDAOException {
+    public WorkflowsDBDAOFactory() throws WorkflowsDBDAOException {
 
         try {
             PluginConfiguration conf = PluginConfiguration.getInstance();
