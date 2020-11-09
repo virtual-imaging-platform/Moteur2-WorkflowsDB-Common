@@ -39,10 +39,11 @@ package fr.insalyon.creatis.moteur.plugins.workflowsdb.bean;
  */
 public enum WorkflowStatus {
 
-    Running, 
-    Completed, 
-    Killed, 
-    Cleaned, 
-    Queued, 
+    Running,
+    Completed,
+    Failed,
+    Killed,
+    Cleaned,
+    Queued,
     Unknown
 }
