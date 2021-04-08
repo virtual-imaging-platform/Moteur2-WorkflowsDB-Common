@@ -56,26 +56,24 @@
 
     <repositories>
         <repository>
-            <id>thirdparty</id>
-            <url>http://vip.creatis.insa-lyon.fr:9007/nexus/content/repositories/thirdparty</url>
+            <id>creatis</id>
+            <name>Creatis Insa Lyon repository [creatis]</name>
+            <url>https://vip.creatis.insa-lyon.fr:9007/nexus/repository/public</url>
         </repository>
     </repositories>
 
-    <scm>
-        <connection>scm:svn:svn+ssh://svn.creatis.insa-lyon.fr/Moteur2-WorkflowsDB-Common/tags/moteur2-workflowsdb-common-1.0</connection>
-        <developerConnection>scm:svn:svn+ssh://svn.creatis.insa-lyon.fr/Moteur2-WorkflowsDB-Common/tags/moteur2-workflowsdb-common-1.0</developerConnection>
-        <url>scm:svn:svn+ssh://svn.creatis.insa-lyon.fr/Moteur2-WorkflowsDB-Common/tags/moteur2-workflowsdb-common-1.0</url>
-    </scm>
-        
     <distributionManagement>
         <repository>
             <id>creatis-releases</id>
-            <url>http://vip.creatis.insa-lyon.fr:9007/nexus/content/repositories/releases</url>
+            <name>Internal Releases</name>
+            <url>https://vip.creatis.insa-lyon.fr:9007/nexus/repository/releases</url>
         </repository>
+
         <snapshotRepository>
             <id>creatis-snapshots</id>
             <name>Internal Snapshots</name>
-            <url>http://vip.creatis.insa-lyon.fr:9007/nexus/content/repositories/snapshots</url>
+            <url>https://vip.creatis.insa-lyon.fr:9007/nexus/repository/snapshots</url>
         </snapshotRepository>
+
     </distributionManagement>
 </project>
