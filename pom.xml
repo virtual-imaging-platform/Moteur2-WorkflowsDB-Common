@@ -3,7 +3,7 @@
 
     <groupId>fr.insalyon.creatis</groupId>
     <artifactId>moteur2-workflowsdb-common</artifactId>
-    <version>1.6</version>
+    <version>1.7.0-SNAPHSOT</version>
     <packaging>jar</packaging>
 
     <name>Moteur2-WorkflowsDB-Common</name>
