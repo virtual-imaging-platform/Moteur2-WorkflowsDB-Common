@@ -52,11 +52,13 @@
             <version>4.1.1.Final</version>
         </dependency>
 
+        <!-- It should not be necessary as the mariadb connector should be used in project depending on workflowsdb-common >
         <dependency>
             <groupId>mysql</groupId>
             <artifactId>mysql-connector-java</artifactId>
             <version>8.0.28</version>
         </dependency>
+        </-->
 
     </dependencies>
 
