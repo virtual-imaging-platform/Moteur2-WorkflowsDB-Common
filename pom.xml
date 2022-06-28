@@ -3,7 +3,7 @@
 
     <groupId>fr.insalyon.creatis</groupId>
     <artifactId>moteur2-workflowsdb-common</artifactId>
-    <version>1.5</version>
+    <version>1.6</version>
     <packaging>jar</packaging>
 
     <name>Moteur2-WorkflowsDB-Common</name>
@@ -15,8 +15,8 @@
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>3.0</version>
                 <configuration>
-                    <source>1.8</source>
-                    <target>1.8</target>
+                    <source>11</source>
+                    <target>11</target>
                 </configuration>
             </plugin>
             <plugin>
@@ -51,31 +51,37 @@
             <artifactId>hibernate-entitymanager</artifactId>
             <version>4.1.1.Final</version>
         </dependency>
-        
+
+        <!-- It should not be necessary as the mariadb connector should be used in project depending on workflowsdb-common >
+        <dependency>
+            <groupId>mysql</groupId>
+            <artifactId>mysql-connector-java</artifactId>
+            <version>8.0.28</version>
+        </dependency>
+        </-->
+
     </dependencies>
 
     <repositories>
         <repository>
-            <id>thirdparty</id>
-            <url>http://vip.creatis.insa-lyon.fr:9007/nexus/content/repositories/thirdparty</url>
+            <id>creatis</id>
+            <name>Creatis Insa Lyon repository [creatis]</name>
+            <url>https://vip.creatis.insa-lyon.fr:9007/nexus/repository/public</url>
         </repository>
     </repositories>
 
-    <scm>
-        <connection>scm:svn:svn+ssh://svn.creatis.insa-lyon.fr/Moteur2-WorkflowsDB-Common/tags/moteur2-workflowsdb-common-1.0</connection>
-        <developerConnection>scm:svn:svn+ssh://svn.creatis.insa-lyon.fr/Moteur2-WorkflowsDB-Common/tags/moteur2-workflowsdb-common-1.0</developerConnection>
-        <url>scm:svn:svn+ssh://svn.creatis.insa-lyon.fr/Moteur2-WorkflowsDB-Common/tags/moteur2-workflowsdb-common-1.0</url>
-    </scm>
-        
     <distributionManagement>
         <repository>
             <id>creatis-releases</id>
-            <url>http://vip.creatis.insa-lyon.fr:9007/nexus/content/repositories/releases</url>
+            <name>Internal Releases</name>
+            <url>https://vip.creatis.insa-lyon.fr:9007/nexus/repository/releases</url>
         </repository>
+
         <snapshotRepository>
             <id>creatis-snapshots</id>
             <name>Internal Snapshots</name>
-            <url>http://vip.creatis.insa-lyon.fr:9007/nexus/content/repositories/snapshots</url>
+            <url>https://vip.creatis.insa-lyon.fr:9007/nexus/repository/snapshots</url>
         </snapshotRepository>
+
     </distributionManagement>
 </project>
