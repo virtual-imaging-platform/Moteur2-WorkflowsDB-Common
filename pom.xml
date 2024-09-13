@@ -3,7 +3,7 @@
 
     <groupId>fr.insalyon.creatis</groupId>
     <artifactId>moteur2-workflowsdb-common</artifactId>
-    <version>1.7.0-SNAPHSOT</version>
+    <version>1.7.0-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <name>Moteur2-WorkflowsDB-Common</name>
@@ -15,8 +15,8 @@
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>3.0</version>
                 <configuration>
-                    <source>11</source>
-                    <target>11</target>
+                    <source>21</source>
+                    <target>21</target>
                 </configuration>
             </plugin>
             <plugin>
@@ -48,9 +48,16 @@
         
         <dependency>
             <groupId>org.hibernate</groupId>
-            <artifactId>hibernate-entitymanager</artifactId>
-            <version>4.1.1.Final</version>
+            <artifactId>hibernate-core</artifactId>
+            <version>6.6.0.Final</version>
         </dependency>
+
+		<dependency>
+			<groupId>org.junit.jupiter</groupId>
+    		<artifactId>junit-jupiter</artifactId>
+			<version>5.11.0</version>
+			<scope>test</scope>
+		</dependency>
 
         <!-- It should not be necessary as the mariadb connector should be used in project depending on workflowsdb-common >
         <dependency>
