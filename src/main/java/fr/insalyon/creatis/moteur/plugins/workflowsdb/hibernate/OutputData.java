@@ -36,6 +36,7 @@ package fr.insalyon.creatis.moteur.plugins.workflowsdb.hibernate;
 import fr.insalyon.creatis.moteur.plugins.workflowsdb.bean.Output;
 import fr.insalyon.creatis.moteur.plugins.workflowsdb.dao.OutputDAO;
 import fr.insalyon.creatis.moteur.plugins.workflowsdb.dao.WorkflowsDBDAOException;
+
 import java.util.List;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
@@ -53,16 +54,14 @@ public class OutputData implements OutputDAO {
 
         this.sessionFactory = sessionFactory;
     }
-    
+
     @Override
     public void add(Output output) throws WorkflowsDBDAOException {
-        
-        try {
-            Session session = sessionFactory.openSession();
+
+        try (Session session = sessionFactory.openSession()) {
             session.beginTransaction();
-            session.saveOrUpdate(output);
+            session.merge(output);
             session.getTransaction().commit();
-            session.close();
 
         } catch (HibernateException ex) {
             throw new WorkflowsDBDAOException(ex);
@@ -71,18 +70,15 @@ public class OutputData implements OutputDAO {
 
     @Override
     public List<Output> get(String workflowID) throws WorkflowsDBDAOException {
-        
-        try {
-            Session session = sessionFactory.openSession();
+
+        try (Session session = sessionFactory.openSession()) {
             session.beginTransaction();
-            List<Output> list = (List<Output>) session.getNamedQuery("Outputs.findById")
-                    .setString("workflowID", workflowID)
-                    .list();
+            List<Output> list = session.createNamedQuery("Outputs.findById", Output.class)
+                    .setParameter("workflowID", workflowID)
+                    .getResultList();
             session.getTransaction().commit();
-            session.close();
 
             return list;
-
         } catch (HibernateException ex) {
             throw new WorkflowsDBDAOException(ex);
         }
@@ -90,15 +86,13 @@ public class OutputData implements OutputDAO {
 
     @Override
     public void removeById(String workflowID) throws WorkflowsDBDAOException {
-        
-        try {
-            Session session = sessionFactory.openSession();
+
+        try (Session session = sessionFactory.openSession()) {
             session.beginTransaction();
-            session.getNamedQuery("Outputs.deleteById")
-                    .setString("workflowID", workflowID)
+            session.createNamedQuery("Outputs.deleteById")
+                    .setParameter("workflowID", workflowID)
                     .executeUpdate();
             session.getTransaction().commit();
-            session.close();
 
         } catch (HibernateException ex) {
             throw new WorkflowsDBDAOException(ex);

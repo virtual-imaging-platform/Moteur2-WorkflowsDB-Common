@@ -36,15 +36,18 @@ import fr.insalyon.creatis.moteur.plugins.workflowsdb.bean.Workflow;
 import fr.insalyon.creatis.moteur.plugins.workflowsdb.bean.WorkflowStatus;
 import fr.insalyon.creatis.moteur.plugins.workflowsdb.dao.WorkflowDAO;
 import fr.insalyon.creatis.moteur.plugins.workflowsdb.dao.WorkflowsDBDAOException;
+import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.CriteriaQuery;
+import jakarta.persistence.criteria.Predicate;
+import jakarta.persistence.criteria.Root;
+
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import org.hibernate.Criteria;
+
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
-import org.hibernate.criterion.Junction;
-import org.hibernate.criterion.Order;
-import org.hibernate.criterion.Restrictions;
 
 /**
  *
@@ -62,12 +65,10 @@ public class WorkflowData implements WorkflowDAO {
     @Override
     public void add(Workflow workflow) throws WorkflowsDBDAOException {
 
-        try {
-            Session session = sessionFactory.openSession();
+        try (Session session = sessionFactory.openSession()) {
             session.beginTransaction();
-            session.saveOrUpdate(workflow);
+            session.merge(workflow);
             session.getTransaction().commit();
-            session.close();
 
         } catch (HibernateException ex) {
             throw new WorkflowsDBDAOException(ex);
@@ -77,12 +78,10 @@ public class WorkflowData implements WorkflowDAO {
     @Override
     public void update(Workflow workflow) throws WorkflowsDBDAOException {
 
-        try {
-            Session session = sessionFactory.openSession();
+        try (Session session = sessionFactory.openSession()) {
             session.beginTransaction();
             session.merge(workflow);
             session.getTransaction().commit();
-            session.close();
 
         } catch (HibernateException ex) {
             throw new WorkflowsDBDAOException(ex);
@@ -92,12 +91,10 @@ public class WorkflowData implements WorkflowDAO {
     @Override
     public void remove(Workflow workflow) throws WorkflowsDBDAOException {
 
-        try {
-            Session session = sessionFactory.openSession();
+        try (Session session = sessionFactory.openSession()) {
             session.beginTransaction();
-            session.delete(workflow);
+            session.remove(workflow);
             session.getTransaction().commit();
-            session.close();
 
         } catch (HibernateException ex) {
             throw new WorkflowsDBDAOException(ex);
@@ -107,14 +104,12 @@ public class WorkflowData implements WorkflowDAO {
     @Override
     public void removeById(String id) throws WorkflowsDBDAOException {
 
-        try {
-            Session session = sessionFactory.openSession();
+        try (Session session = sessionFactory.openSession()) {
             session.beginTransaction();
-            session.getNamedQuery("Workflows.removeById")
-                    .setString("id", id)
+            session.createNamedQuery("Workflows.removeById")
+                    .setParameter("id", id)
                     .executeUpdate();
             session.getTransaction().commit();
-            session.close();
 
         } catch (HibernateException ex) {
             throw new WorkflowsDBDAOException(ex);
@@ -124,13 +119,11 @@ public class WorkflowData implements WorkflowDAO {
     @Override
     public List<Workflow> get() throws WorkflowsDBDAOException {
 
-        try {
-            Session session = sessionFactory.openSession();
+        try (Session session = sessionFactory.openSession()) {
             session.beginTransaction();
-            List<Workflow> list = (List<Workflow>) session.getNamedQuery("Workflows.findAll")
-                    .list();
+            List<Workflow> list = session.createNamedQuery("Workflows.findAll", Workflow.class)
+                    .getResultList();
             session.getTransaction().commit();
-            session.close();
 
             return list;
 
@@ -142,14 +135,12 @@ public class WorkflowData implements WorkflowDAO {
     @Override
     public Workflow get(String workflowID) throws WorkflowsDBDAOException {
 
-        try {
-            Session session = sessionFactory.openSession();
+        try (Session session = sessionFactory.openSession()) {
             session.beginTransaction();
-            Workflow workflow = (Workflow) session.getNamedQuery("Workflows.findById")
-                    .setString("id", workflowID)
-                    .uniqueResult();
+            Workflow workflow = session.createNamedQuery("Workflows.findById", Workflow.class)
+                    .setParameter("id", workflowID)
+                    .getSingleResult();
             session.getTransaction().commit();
-            session.close();
 
             return workflow;
 
@@ -160,25 +151,27 @@ public class WorkflowData implements WorkflowDAO {
 
     @Override
     public List<Workflow> get(String username, Date startedTime) throws WorkflowsDBDAOException {
-
-        try {
-            Session session = sessionFactory.openSession();
+        try (Session session = sessionFactory.openSession()) {
             session.beginTransaction();
-            Criteria criteria = session.createCriteria(Workflow.class);
+
+            CriteriaBuilder criteriaBuilder = session.getCriteriaBuilder();
+            CriteriaQuery<Workflow> criteriaQuery = criteriaBuilder.createQuery(Workflow.class);
+            Root<Workflow> root = criteriaQuery.from(Workflow.class);
+            List<Predicate> predicates = new ArrayList<>();
 
             if (username != null) {
-                criteria.add(Restrictions.eq("username", username));
+                predicates.add(criteriaBuilder.equal(root.get("username"), username));
             }
-            if(startedTime!=null)
-            if (startedTime != null) {
-                criteria.add(Restrictions.lt("startedTime", startedTime));
-            }
-            criteria.addOrder(Order.desc("startedTime"));
-            criteria.setMaxResults(10);
 
-            List<Workflow> list = (List<Workflow>) criteria.list();
+            if (startedTime != null) {
+                predicates.add(criteriaBuilder.lessThan(root.get("startedTime"), startedTime));
+            }
+
+            criteriaQuery.where(predicates.toArray(new Predicate[0]));
+            criteriaQuery.orderBy(criteriaBuilder.desc(root.get("startedTime")));
+
+            List<Workflow> list = session.createQuery(criteriaQuery).setMaxResults(10).getResultList();
             session.getTransaction().commit();
-            session.close();
 
             return list;
 
@@ -192,34 +185,43 @@ public class WorkflowData implements WorkflowDAO {
             WorkflowStatus status, String applicationClass, Date startDate, Date endDate)
             throws WorkflowsDBDAOException {
 
-        try {
-            Session session = sessionFactory.openSession();
+        try (Session session = sessionFactory.openSession()) {
             session.beginTransaction();
-            Criteria criteria = session.createCriteria(Workflow.class);
+
+            CriteriaBuilder criteriaBuilder = session.getCriteriaBuilder();
+            CriteriaQuery<Workflow> criteriaQuery = criteriaBuilder.createQuery(Workflow.class);
+            Root<Workflow> root = criteriaQuery.from(Workflow.class);
+            List<Predicate> predicates = new ArrayList<>();
 
             if (username != null) {
-                criteria.add(Restrictions.eq("username", username));
+                predicates.add(criteriaBuilder.equal(root.get("username"), username));
             }
-            if (applicationName != null) {
-                criteria.add(Restrictions.eq("application", applicationName));
-            }
-            if (status != null) {
-                criteria.add(Restrictions.eq("status", status));
-            }
-            if (applicationClass != null) {
-                criteria.add(Restrictions.eq("applicationClass", applicationClass));
-            }
-            if (startDate != null) {
-                criteria.add(Restrictions.ge("startedTime", startDate));
-            }
-            if (endDate != null) {
-                criteria.add(Restrictions.le("startedTime", endDate));
-            }
-            criteria.addOrder(Order.desc("startedTime"));
 
-            List<Workflow> list = (List<Workflow>) criteria.list();
+            if (applicationName != null) {
+                predicates.add(criteriaBuilder.equal(root.get("application"), applicationName));
+            }
+
+            if (status != null) {
+                predicates.add(criteriaBuilder.equal(root.get("status"), status));
+            }
+
+            if (applicationClass != null) {
+                predicates.add(criteriaBuilder.equal(root.get("applicationClass"), applicationClass));
+            }
+
+            if (startDate != null) {
+                predicates.add(criteriaBuilder.greaterThan(root.get("startedTime"), startDate));
+            }
+
+            if (endDate != null) {
+                predicates.add(criteriaBuilder.lessThan(root.get("startedTime"), endDate));
+            }
+
+            criteriaQuery.where(predicates.toArray(new Predicate[0]));
+            criteriaQuery.orderBy(criteriaBuilder.desc(root.get("startedTime")));
+
+            List<Workflow> list = session.createQuery(criteriaQuery).getResultList();
             session.getTransaction().commit();
-            session.close();
 
             return list;
 
@@ -233,39 +235,44 @@ public class WorkflowData implements WorkflowDAO {
             WorkflowStatus status, String applicationClass, Date startDate, Date endDate)
             throws WorkflowsDBDAOException {
 
-        try {
-            Session session = sessionFactory.openSession();
+        try (Session session = sessionFactory.openSession()) {
             session.beginTransaction();
-            Criteria criteria = session.createCriteria(Workflow.class);
+
+            CriteriaBuilder criteriaBuilder = session.getCriteriaBuilder();
+            CriteriaQuery<Workflow> criteriaQuery = criteriaBuilder.createQuery(Workflow.class);
+            Root<Workflow> root = criteriaQuery.from(Workflow.class);
+            List<Predicate> predicates = new ArrayList<>();
 
             if (usersList != null && !usersList.isEmpty()) {
-                Junction junction = Restrictions.disjunction();
-                for (String username : usersList) {
-                    junction.add(Restrictions.eq("username", username));
-                }
-                criteria.add(junction);
+                predicates.add(root.get("username").in(usersList));
             }
+
             if (applicationName != null) {
-                criteria.add(Restrictions.eq("application", applicationName));
+                predicates.add(criteriaBuilder.equal(root.get("application"), applicationName));
             }
+
             if (status != null) {
-                criteria.add(Restrictions.eq("status", status));
+                predicates.add(criteriaBuilder.equal(root.get("status"), status));
             }
+
             if (applicationClass != null) {
-                criteria.add(Restrictions.eq("applicationClass", applicationClass));
+                predicates.add(criteriaBuilder.equal(root.get("applicationClass"), applicationClass));
             }
+
             if (startDate != null) {
-                criteria.add(Restrictions.ge("startedTime", startDate));
+                predicates.add(criteriaBuilder.greaterThan(root.get("startedTime"), startDate));
             }
+
             if (endDate != null) {
-                criteria.add(Restrictions.le("startedTime", endDate));
+                predicates.add(criteriaBuilder.lessThan(root.get("startedTime"), endDate));
             }
-            criteria.addOrder(Order.desc("startedTime"));
 
-            List<Workflow> list = (List<Workflow>) criteria.list();
+            criteriaQuery.where(predicates.toArray(new Predicate[0]));
+            criteriaQuery.orderBy(criteriaBuilder.desc(root.get("startedTime")));
+
+            List<Workflow> list = session.createQuery(criteriaQuery).getResultList();
+
             session.getTransaction().commit();
-            session.close();
-
             return list;
 
         } catch (HibernateException ex) {
@@ -276,14 +283,12 @@ public class WorkflowData implements WorkflowDAO {
     @Override
     public List<Workflow> getByUsername(String username) throws WorkflowsDBDAOException {
 
-        try {
-            Session session = sessionFactory.openSession();
+        try (Session session = sessionFactory.openSession()) {
             session.beginTransaction();
-            List<Workflow> list = (List<Workflow>) session.getNamedQuery("Workflows.findByUser")
-                    .setString("username", username)
-                    .list();
+            List<Workflow> list = session.createNamedQuery("Workflows.findByUser", Workflow.class)
+                    .setParameter("username", username)
+                    .getResultList();
             session.getTransaction().commit();
-            session.close();
 
             return list;
 
@@ -295,15 +300,13 @@ public class WorkflowData implements WorkflowDAO {
     @Override
     public long getNumberOfRunning(String username) throws WorkflowsDBDAOException {
 
-        try {
-            Session session = sessionFactory.openSession();
+        try (Session session = sessionFactory.openSession()) {
             session.beginTransaction();
-            Long running = (Long) session.getNamedQuery("Workflows.NumberOfRunning")
-                    .setString("username", username)
-                    .setString("status", WorkflowStatus.Running.name())
-                    .uniqueResult();
+            Long running = session.createNamedQuery("Workflows.NumberOfRunning", Long.class)
+                    .setParameter("username", username)
+                    .setParameter("status", WorkflowStatus.Running)
+                    .getSingleResult();
             session.getTransaction().commit();
-            session.close();
 
             return running;
 
@@ -311,19 +314,17 @@ public class WorkflowData implements WorkflowDAO {
             throw new WorkflowsDBDAOException(ex);
         }
     }
-    
+
     @Override
     public long getNumberOfRunningPerEngine(String engine) throws WorkflowsDBDAOException {
 
-        try {
-            Session session = sessionFactory.openSession();
+        try (Session session = sessionFactory.openSession()) {
             session.beginTransaction();
-            Long running = (Long) session.getNamedQuery("Workflows.NumberOfRunningPerEngine")
-                    .setString("engine", engine)
-                    .setString("status", WorkflowStatus.Running.name())
-                    .uniqueResult();
+            Long running = session.createNamedQuery("Workflows.NumberOfRunningPerEngine", Long.class)
+                    .setParameter("engine", engine)
+                    .setParameter("status", WorkflowStatus.Running)
+                    .getSingleResult();
             session.getTransaction().commit();
-            session.close();
 
             return running;
 
@@ -331,19 +332,17 @@ public class WorkflowData implements WorkflowDAO {
             throw new WorkflowsDBDAOException(ex);
         }
     }
-    
+
     @Override
     public void updateUsername(String newUser, String currentUser) throws WorkflowsDBDAOException {
 
-        try {
-            Session session = sessionFactory.openSession();
+        try (Session session = sessionFactory.openSession()) {
             session.beginTransaction();
-            session.getNamedQuery("Workflows.updateUser")
-                    .setString("newUser", newUser)
-                    .setString("currentUser", currentUser)
+            session.createNamedQuery("Workflows.updateUser")
+                    .setParameter("newUser", newUser)
+                    .setParameter("currentUser", currentUser)
                     .executeUpdate();
             session.getTransaction().commit();
-            session.close();
 
         } catch (HibernateException ex) {
             throw new WorkflowsDBDAOException(ex);
@@ -353,14 +352,12 @@ public class WorkflowData implements WorkflowDAO {
     @Override
     public List<Workflow> getRunning() throws WorkflowsDBDAOException {
 
-        try {
-            Session session = sessionFactory.openSession();
+        try (Session session = sessionFactory.openSession()) {
             session.beginTransaction();
-            List<Workflow> list = (List<Workflow>) session.getNamedQuery("Workflows.getRunning")
-                    .setString("status", WorkflowStatus.Running.name())
-                    .list();
+            List<Workflow> list = (List<Workflow>) session.createNamedQuery("Workflows.getRunning", Workflow.class)
+                    .setParameter("status", WorkflowStatus.Running)
+                    .getResultList();
             session.getTransaction().commit();
-            session.close();
 
             return list;
 

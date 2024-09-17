@@ -51,7 +51,7 @@ public class PluginConfiguration {
     private String driverClass;
     private String url;
 
-    public static PluginConfiguration getInstance() throws Exception {
+    public static PluginConfiguration getInstance() throws WorkflowsDBException {
 
         if (instance == null) {
             instance = new PluginConfiguration();
