@@ -39,7 +39,6 @@
     </build>
 
     <dependencies>
-        
         <dependency>
             <groupId>commons-configuration</groupId>
             <artifactId>commons-configuration</artifactId>
@@ -52,21 +51,33 @@
             <version>6.6.0.Final</version>
         </dependency>
 
-		<dependency>
+        <dependency>
+            <groupId>org.mariadb.jdbc</groupId>
+            <artifactId>mariadb-java-client</artifactId>
+            <version>3.4.1</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
 			<groupId>org.junit.jupiter</groupId>
     		<artifactId>junit-jupiter</artifactId>
 			<version>5.11.0</version>
 			<scope>test</scope>
 		</dependency>
 
-        <!-- It should not be necessary as the mariadb connector should be used in project depending on workflowsdb-common >
         <dependency>
-            <groupId>mysql</groupId>
-            <artifactId>mysql-connector-java</artifactId>
-            <version>8.0.28</version>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-junit-jupiter</artifactId>
+            <version>5.13.0</version>
+            <scope>test</scope>
         </dependency>
-        </-->
 
+        <dependency>
+            <groupId>org.testcontainers</groupId>
+            <artifactId>mariadb</artifactId>
+            <version>1.20.1</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
     <repositories>
