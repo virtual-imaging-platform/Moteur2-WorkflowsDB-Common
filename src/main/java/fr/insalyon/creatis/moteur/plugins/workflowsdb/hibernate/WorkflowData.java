@@ -122,7 +122,7 @@ public class WorkflowData implements WorkflowDAO {
         try (Session session = sessionFactory.openSession()) {
             session.beginTransaction();
             List<Workflow> list = session.createNamedQuery("Workflows.findAll", Workflow.class)
-                    .getResultList();
+                    .list();
             session.getTransaction().commit();
 
             return list;
@@ -170,7 +170,7 @@ public class WorkflowData implements WorkflowDAO {
             criteriaQuery.where(predicates.toArray(new Predicate[0]));
             criteriaQuery.orderBy(criteriaBuilder.desc(root.get("startedTime")));
 
-            List<Workflow> list = session.createQuery(criteriaQuery).setMaxResults(10).getResultList();
+            List<Workflow> list = session.createQuery(criteriaQuery).setMaxResults(10).list();
             session.getTransaction().commit();
 
             return list;
@@ -220,7 +220,7 @@ public class WorkflowData implements WorkflowDAO {
             criteriaQuery.where(predicates.toArray(new Predicate[0]));
             criteriaQuery.orderBy(criteriaBuilder.desc(root.get("startedTime")));
 
-            List<Workflow> list = session.createQuery(criteriaQuery).getResultList();
+            List<Workflow> list = session.createQuery(criteriaQuery).list();
             session.getTransaction().commit();
 
             return list;
@@ -270,7 +270,7 @@ public class WorkflowData implements WorkflowDAO {
             criteriaQuery.where(predicates.toArray(new Predicate[0]));
             criteriaQuery.orderBy(criteriaBuilder.desc(root.get("startedTime")));
 
-            List<Workflow> list = session.createQuery(criteriaQuery).getResultList();
+            List<Workflow> list = session.createQuery(criteriaQuery).list();
 
             session.getTransaction().commit();
             return list;
@@ -287,7 +287,7 @@ public class WorkflowData implements WorkflowDAO {
             session.beginTransaction();
             List<Workflow> list = session.createNamedQuery("Workflows.findByUser", Workflow.class)
                     .setParameter("username", username)
-                    .getResultList();
+                    .list();
             session.getTransaction().commit();
 
             return list;
@@ -356,7 +356,7 @@ public class WorkflowData implements WorkflowDAO {
             session.beginTransaction();
             List<Workflow> list = (List<Workflow>) session.createNamedQuery("Workflows.getRunning", Workflow.class)
                     .setParameter("status", WorkflowStatus.Running)
-                    .getResultList();
+                    .list();
             session.getTransaction().commit();
 
             return list;

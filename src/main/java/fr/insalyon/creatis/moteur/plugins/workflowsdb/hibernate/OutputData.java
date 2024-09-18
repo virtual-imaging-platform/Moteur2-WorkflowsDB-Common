@@ -75,7 +75,7 @@ public class OutputData implements OutputDAO {
             session.beginTransaction();
             List<Output> list = session.createNamedQuery("Outputs.findById", Output.class)
                     .setParameter("workflowID", workflowID)
-                    .getResultList();
+                    .list();
             session.getTransaction().commit();
 
             return list;

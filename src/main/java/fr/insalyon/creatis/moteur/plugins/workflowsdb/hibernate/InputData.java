@@ -75,7 +75,7 @@ public class InputData implements InputDAO {
             session.beginTransaction();
             List<Input> list = session.createNamedQuery("Inputs.findById", Input.class)
                     .setParameter("workflowID", workflowID)
-                    .getResultList();
+                    .list();
             session.getTransaction().commit();
 
             return list;
