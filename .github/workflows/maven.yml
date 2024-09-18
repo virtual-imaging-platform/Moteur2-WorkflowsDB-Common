@@ -19,7 +19,7 @@ jobs:
     runs-on: ubuntu-latest
 
     services:
-      docker: docker:27.3.0-rc.1-cli-alpine3.20⁠
+      docker: docker:cli
       options: --privileged
     
     steps:
