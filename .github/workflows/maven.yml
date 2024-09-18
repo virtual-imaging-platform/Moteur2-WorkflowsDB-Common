@@ -17,14 +17,7 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-<<<<<<< HEAD
 
-    services:
-      docker: docker:cli
-      options: --privileged
-=======
->>>>>>> 5337246 (update ci)
-    
     steps:
     - uses: actions/checkout@v4
     - name: Set up JDK 21
