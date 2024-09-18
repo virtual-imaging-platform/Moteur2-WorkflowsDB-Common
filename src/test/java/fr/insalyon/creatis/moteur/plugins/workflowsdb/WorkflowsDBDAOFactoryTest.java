@@ -1,5 +1,6 @@
 package fr.insalyon.creatis.moteur.plugins.workflowsdb;
 
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -131,9 +132,7 @@ public class WorkflowsDBDAOFactoryTest {
         assertEquals(1, dao.get(id.getWorkflowID(), id.getProcessor()).getFailed());
 
         dao.remove(test);
-        assertThrowsExactly(NoResultException.class, () -> {
-            dao.get(id.getWorkflowID(), id.getProcessor());
-        });
+        assertNull(dao.get(id.getWorkflowID(), id.getProcessor()));
 
         dao.removeById(id2.getWorkflowID());
         assertTrue(dao.get(id2.getWorkflowID()).isEmpty());
@@ -154,14 +153,10 @@ public class WorkflowsDBDAOFactoryTest {
         assertEquals(1, dao.get(test.getWorkflowID()).getCancelled());
 
         dao.remove(test);
-        assertThrowsExactly(NoResultException.class, () -> {
-            dao.get(test.getWorkflowID());
-        });
+        assertNull(dao.get(test.getWorkflowID()));
 
         dao.removeById(test.getWorkflowID());
-        assertThrowsExactly(NoResultException.class, () -> {
-            dao.get(test.getWorkflowID());
-        });
+        assertNull(dao.get(test.getWorkflowID()));
     }
 
     @Test
@@ -229,14 +224,10 @@ public class WorkflowsDBDAOFactoryTest {
 
         // public void remove(Workflow workflow) | public void removeById(String id)
         dao.remove(test);
-        assertThrowsExactly(NoResultException.class, () -> {
-            dao.get(test.getId());
-        });
+        assertNull(dao.get(test.getId()));
 
         dao.removeById(test2.getId());
-        assertThrowsExactly(NoResultException.class, () -> {
-            dao.get(test2.getId());
-        });
+        assertNull(dao.get(test2.getId()));
     }
 
     @AfterEach

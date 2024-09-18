@@ -101,7 +101,7 @@ public class ProcessorData implements ProcessorDAO {
             Processor p = session.createNamedQuery("Processors.findByIdAndProcessor", Processor.class)
                     .setParameter("workflowID", workflowID)
                     .setParameter("processor", processor)
-                    .getSingleResult();
+                    .uniqueResult();
             session.getTransaction().commit();
 
             return p;

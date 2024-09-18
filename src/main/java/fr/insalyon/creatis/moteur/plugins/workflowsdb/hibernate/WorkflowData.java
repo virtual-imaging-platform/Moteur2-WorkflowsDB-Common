@@ -139,7 +139,7 @@ public class WorkflowData implements WorkflowDAO {
             session.beginTransaction();
             Workflow workflow = session.createNamedQuery("Workflows.findById", Workflow.class)
                     .setParameter("id", workflowID)
-                    .getSingleResult();
+                    .uniqueResult();
             session.getTransaction().commit();
 
             return workflow;
@@ -305,7 +305,7 @@ public class WorkflowData implements WorkflowDAO {
             Long running = session.createNamedQuery("Workflows.NumberOfRunning", Long.class)
                     .setParameter("username", username)
                     .setParameter("status", WorkflowStatus.Running)
-                    .getSingleResult();
+                    .uniqueResult();
             session.getTransaction().commit();
 
             return running;
@@ -323,7 +323,7 @@ public class WorkflowData implements WorkflowDAO {
             Long running = session.createNamedQuery("Workflows.NumberOfRunningPerEngine", Long.class)
                     .setParameter("engine", engine)
                     .setParameter("status", WorkflowStatus.Running)
-                    .getSingleResult();
+                    .uniqueResult();
             session.getTransaction().commit();
 
             return running;

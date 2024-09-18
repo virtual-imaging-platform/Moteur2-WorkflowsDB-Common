@@ -114,7 +114,7 @@ public class StatsData implements StatsDAO {
             session.beginTransaction();
             Stats stats = session.createNamedQuery("Stats.findById", Stats.class)
                     .setParameter("workflowID", workflowID)
-                    .getSingleResult();
+                    .uniqueResult();
             session.getTransaction().commit();
 
             return stats;
