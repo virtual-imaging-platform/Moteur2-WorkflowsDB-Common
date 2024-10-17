@@ -1,25 +1,25 @@
 package fr.insalyon.creatis.moteur.plugins.workflowsdb;
 
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrowsExactly;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import static org.mockito.Mockito.when;
 
+import java.sql.Connection;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.time.Instant;
 import java.util.Date;
 
-import org.junit.jupiter.api.AfterAll;
+import org.h2.jdbcx.JdbcDataSource;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.testcontainers.containers.MariaDBContainer;
-import org.testcontainers.utility.DockerImageName;
 
 import fr.insalyon.creatis.moteur.plugins.workflowsdb.bean.DataType;
 import fr.insalyon.creatis.moteur.plugins.workflowsdb.bean.Input;
@@ -41,20 +41,25 @@ import fr.insalyon.creatis.moteur.plugins.workflowsdb.dao.WorkflowsDBDAOFactory;
 
 public class WorkflowsDBDAOFactoryTest {
 
-    public static MariaDBContainer<?> mariadb = new MariaDBContainer<>(DockerImageName.parse("mariadb:11.5-ubi"));
+    private static JdbcDataSource   source;
+    private static String           schema = "testdb";
 
     @Mock
-    private PluginConfiguration mockConfig;
-
-    private WorkflowsDBDAOFactory factory;
+    private PluginConfiguration     mockConfig;
+    private WorkflowsDBDAOFactory   factory;
 
     @BeforeAll
-    static void startContainer() throws SQLException {
-        mariadb.start();
-        
-        try (var connection = mariadb.createConnection("")) {
-            try (var stmt = connection.createStatement()) {
-                stmt.execute("ALTER DATABASE " + mariadb.getDatabaseName() + " CHARACTER SET latin1;");
+    static void initDB() throws SQLException {
+        source = new JdbcDataSource();
+
+        source.setURL("jdbc:h2:mem:test;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=TRUE");
+        source.setUser("test");
+        source.setPassword("pass");
+
+
+        try (Connection connection = source.getConnection()) {
+            try (Statement stmt = connection.createStatement()) {
+                stmt.execute("CREATE SCHEMA IF NOT EXISTS " + schema);
             }
         }
     }
@@ -63,12 +68,12 @@ public class WorkflowsDBDAOFactoryTest {
 	void testInit() throws Exception {
         MockitoAnnotations.openMocks(this);
 
-        when(mockConfig.getSchema()).thenReturn(mariadb.getDatabaseName());
-        when(mockConfig.getDriverClass()).thenReturn("org.mariadb.jdbc.Driver");
-        when(mockConfig.getUrl()).thenReturn(mariadb.getJdbcUrl());
+        when(mockConfig.getSchema()).thenReturn(schema);
+        when(mockConfig.getDriverClass()).thenReturn("org.h2.Driver");
+        when(mockConfig.getUrl()).thenReturn(source.getURL());
         when(mockConfig.getDialect()).thenReturn("org.hibernate.dialect.MySQLDialect");
-        when(mockConfig.getUser()).thenReturn(mariadb.getUsername());
-        when(mockConfig.getPassword()).thenReturn(mariadb.getPassword());
+        when(mockConfig.getUser()).thenReturn(source.getUser());
+        when(mockConfig.getPassword()).thenReturn(source.getPassword());
 
         factory = new WorkflowsDBDAOFactory(mockConfig);
 	}
@@ -232,11 +237,6 @@ public class WorkflowsDBDAOFactoryTest {
     @AfterEach
     void testClean() {
         factory.close();
-    }
-
-    @AfterAll
-    static void containerStop() {
-        mariadb.stop();
     }
 }
 
