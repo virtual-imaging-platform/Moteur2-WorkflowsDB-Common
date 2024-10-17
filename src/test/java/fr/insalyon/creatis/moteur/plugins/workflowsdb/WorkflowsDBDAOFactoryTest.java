@@ -65,7 +65,7 @@ public class WorkflowsDBDAOFactoryTest {
     }
 
     @BeforeEach
-	void testInit() throws Exception {
+    void testInit() throws Exception {
         MockitoAnnotations.openMocks(this);
 
         when(mockConfig.getSchema()).thenReturn(schema);
@@ -76,7 +76,7 @@ public class WorkflowsDBDAOFactoryTest {
         when(mockConfig.getPassword()).thenReturn(source.getPassword());
 
         factory = new WorkflowsDBDAOFactory(mockConfig);
-	}
+    }
 
     @Test
     void factory() {
