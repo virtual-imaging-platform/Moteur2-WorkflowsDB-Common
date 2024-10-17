@@ -78,9 +78,13 @@ public class WorkflowsDBDAOFactory {
             cfg.setProperty("javax.persistence.validation.mode", "none");
             cfg.setProperty("hibernate.validator.apply_to_ddl", "false");
             cfg.setProperty("hibernate.validator.autoregister_listeners", "false");
+            // Automaticly create the schema inside the database (or update it)
             cfg.setProperty("hibernate.hbm2ddl.auto", "update");
+            // This is for priting sql commands send by hibernate
             cfg.setProperty("hibernate.show_sql", "true");
+            // This comes with SHOW_SQL but just to format it (pretty print)
             cfg.setProperty("hibernate.format_sql", "true");
+            // This comes with SHOW_SQL and it allows to print present inside the code
             cfg.setProperty("use_sql_comments", "true");
 
             cfg.addAnnotatedClass(Workflow.class);
