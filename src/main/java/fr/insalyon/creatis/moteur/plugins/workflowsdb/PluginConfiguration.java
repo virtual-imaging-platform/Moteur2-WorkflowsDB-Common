@@ -114,4 +114,12 @@ public class PluginConfiguration {
     public String getUrl() {
         return url;
     }
+
+    public String getHbm2ddl() {
+        return "verify";
+    }
+
+    public String getShowSql() {
+        return "false";
+    }
 }
