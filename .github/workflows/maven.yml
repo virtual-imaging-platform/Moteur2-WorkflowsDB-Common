@@ -1,31 +1,26 @@
-# This workflow will build a Java project with Maven, and cache/restore any dependencies to improve the workflow execution time
-# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-java-with-maven
+# This is the template for the all of the JAVA VIP projects workflow CI integration
 
-# This workflow uses actions that are not certified by GitHub.
-# They are provided by a third-party and are governed by
-# separate terms of service, privacy policy, and support
-# documentation.
-
-name: Java CI with Maven
+name: VIP CI Integration
+env: # beware env value are of string type, not boolean. Need to use fromJSON to convert them to boolean
+  isProduction: ${{ github.event_name == 'push' && github.ref_name == 'master' }}
+  prepareRelease: ${{ github.event_name == 'push' && github.ref_name == 'develop' && contains(github.event.head_commit.message, 'prepare release') }}
 
 on:
   push:
-    branches: [ "develop" ]
+    branches: [develop, master]
   pull_request:
-    branches: [ "develop" ]
+    branches: [develop]
 
 jobs:
-  build:
+  all:
     runs-on: ubuntu-latest
-
     steps:
-    - uses: actions/checkout@v4
-    - name: Set up JDK 21
-      uses: actions/setup-java@v4
-      with:
-        java-version: '21'
-        distribution: 'oracle'
-        cache: maven
-        
-    - name: Build with Maven
-      run: mvn -B clean verify
+      - name: Review Code
+        uses: virtual-imaging-platform/vip-github-actions/.github/actions/pmd@develop
+        with:
+          quality: 95
+
+      - name: Maven
+        uses: virtual-imaging-platform/vip-github-actions/.github/actions/maven@develop
+        with:
+          maven_password: ${{ secrets.NEXUS_PSW }}
