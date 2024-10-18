@@ -7,17 +7,21 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import static org.mockito.Mockito.when;
 
-import java.sql.Connection;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
+import java.util.stream.Stream;
 
-import org.h2.jdbcx.JdbcDataSource;
+import org.h2.store.Data;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
@@ -38,53 +42,43 @@ import fr.insalyon.creatis.moteur.plugins.workflowsdb.dao.StatsDAO;
 import fr.insalyon.creatis.moteur.plugins.workflowsdb.dao.WorkflowDAO;
 import fr.insalyon.creatis.moteur.plugins.workflowsdb.dao.WorkflowsDBDAOException;
 import fr.insalyon.creatis.moteur.plugins.workflowsdb.dao.WorkflowsDBDAOFactory;
+import fr.insalyon.creatis.moteur.plugins.workflowsdb.databases.H2;
+import fr.insalyon.creatis.moteur.plugins.workflowsdb.databases.MariaDB;
 
 public class WorkflowsDBDAOFactoryTest {
 
-    private static JdbcDataSource   source;
-    private static String           schema = "testdb";
-
-    @Mock
-    private PluginConfiguration     mockConfig;
     private WorkflowsDBDAOFactory   factory;
 
+    static Database[] databases = { new H2(), new MariaDB() };
+
+    static Stream<Database> setups() {
+        return Stream.of(databases);
+    }
+
     @BeforeAll
-    static void initDB() throws SQLException {
-        source = new JdbcDataSource();
-
-        source.setURL("jdbc:h2:mem:test;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=TRUE");
-        source.setUser("test");
-        source.setPassword("pass");
-
-
-        try (Connection connection = source.getConnection()) {
-            try (Statement stmt = connection.createStatement()) {
-                stmt.execute("CREATE SCHEMA IF NOT EXISTS " + schema);
-            }
+    static void startDBs() throws SQLException {
+        for (Database db : databases) {
+            db.create();
         }
     }
 
-    @BeforeEach
-    void testInit() throws Exception {
-        MockitoAnnotations.openMocks(this);
-
-        when(mockConfig.getSchema()).thenReturn(schema);
-        when(mockConfig.getDriverClass()).thenReturn("org.h2.Driver");
-        when(mockConfig.getUrl()).thenReturn(source.getURL());
-        when(mockConfig.getDialect()).thenReturn("org.hibernate.dialect.MySQLDialect");
-        when(mockConfig.getUser()).thenReturn(source.getUser());
-        when(mockConfig.getPassword()).thenReturn(source.getPassword());
-
-        factory = new WorkflowsDBDAOFactory(mockConfig);
+    @AfterAll
+    static void stopDBs() {
+        for (Database db : databases) {
+            db.delete();
+        }
     }
 
-    @Test
-    void factory() {
-       assertNotNull(factory);
+    @ParameterizedTest @MethodSource("setups")
+    void factory(Database db) {
+        factory = db.getFactory();
+        assertNotNull(factory);
     }
 
-    @Test
-    void daosNotNull() {
+    @ParameterizedTest @MethodSource("setups")
+    void daosNotNull(Database db) {
+        factory = db.getFactory();
+
         assertNotNull(factory.getInputDAO());
         assertNotNull(factory.getOutputDAO());
         assertNotNull(factory.getProcessorDAO());
@@ -92,8 +86,9 @@ public class WorkflowsDBDAOFactoryTest {
         assertNotNull(factory.getWorkflowDAO());
     }
 
-    @Test
-    void inputTest() throws WorkflowsDBDAOException {
+    @ParameterizedTest @MethodSource("setups")
+    void inputTest(Database db) throws WorkflowsDBDAOException {
+        factory = db.getFactory();
         InputDAO dao = factory.getInputDAO();
         InputID id = new InputID("non", "superpath", "oui");
         Input test = new Input(id, DataType.String);
@@ -105,8 +100,9 @@ public class WorkflowsDBDAOFactoryTest {
         assertTrue(dao.get(id.getWorkflowID()).isEmpty());
     }
 
-    @Test
-    void outputTest() throws WorkflowsDBDAOException {
+    @ParameterizedTest @MethodSource("setups")
+    void outputTest(Database db) throws WorkflowsDBDAOException {
+        factory = db.getFactory();
         OutputDAO dao = factory.getOutputDAO();
         OutputID id = new OutputID("non", "paspath", "non");
         Output test = new Output(id, DataType.String, "123");
@@ -118,8 +114,9 @@ public class WorkflowsDBDAOFactoryTest {
         assertTrue(dao.get(id.getWorkflowID()).isEmpty());
     }
 
-    @Test
-    void processorTest() throws WorkflowsDBDAOException {
+    @ParameterizedTest @MethodSource("setups")
+    void processorTest(Database db) throws WorkflowsDBDAOException {
+        factory = db.getFactory();
         ProcessorDAO dao = factory.getProcessorDAO();
         ProcessorID id = new ProcessorID("non", "blabli");
         ProcessorID id2 = new ProcessorID("non", "blibla");
@@ -142,8 +139,9 @@ public class WorkflowsDBDAOFactoryTest {
         assertTrue(dao.get(id2.getWorkflowID()).isEmpty());
     }
 
-    @Test
-    void statsTest() throws WorkflowsDBDAOException {
+    @ParameterizedTest @MethodSource("setups")
+    void statsTest(Database db) throws WorkflowsDBDAOException {
+        factory = db.getFactory();
         StatsDAO dao = factory.getStatsDAO();
         Stats test = new Stats("workflou");
         Stats test2 = new Stats("workfleau");
@@ -163,8 +161,9 @@ public class WorkflowsDBDAOFactoryTest {
         assertNull(dao.get(test.getWorkflowID()));
     }
 
-    @Test
-    void workflowsTest() throws WorkflowsDBDAOException {
+    @ParameterizedTest @MethodSource("setups")
+    void workflowsTest(Database db) throws WorkflowsDBDAOException {
+        factory = db.getFactory();
         WorkflowDAO dao = factory.getWorkflowDAO();
         Date dateABefore = Date.from(Instant.now().minusSeconds(60));
         Date dateA = Date.from(Instant.now().minusSeconds(50));
@@ -232,11 +231,6 @@ public class WorkflowsDBDAOFactoryTest {
 
         dao.removeById(test2.getId());
         assertNull(dao.get(test2.getId()));
-    }
-
-    @AfterEach
-    void testClean() {
-        factory.close();
     }
 }
 
