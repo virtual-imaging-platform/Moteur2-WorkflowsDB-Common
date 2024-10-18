@@ -34,4 +34,9 @@ public class H2 extends Database {
 
     @Override
     public void delete() {}
+
+    @Override
+    public boolean isAvailable() {
+        return true;
+    }
 }

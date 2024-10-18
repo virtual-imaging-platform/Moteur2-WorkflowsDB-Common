@@ -41,6 +41,7 @@ import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
 
+import java.util.Collections;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -182,57 +183,16 @@ public class WorkflowData implements WorkflowDAO {
 
     @Override
     public List<Workflow> get(String username, String applicationName,
-            WorkflowStatus status, String applicationClass, Date startDate, Date endDate)
+            WorkflowStatus status, String applicationClass, Date startDate, Date endDate, String tag)
             throws WorkflowsDBDAOException {
 
-        try (Session session = sessionFactory.openSession()) {
-            session.beginTransaction();
-
-            CriteriaBuilder criteriaBuilder = session.getCriteriaBuilder();
-            CriteriaQuery<Workflow> criteriaQuery = criteriaBuilder.createQuery(Workflow.class);
-            Root<Workflow> root = criteriaQuery.from(Workflow.class);
-            List<Predicate> predicates = new ArrayList<>();
-
-            if (username != null) {
-                predicates.add(criteriaBuilder.equal(root.get("username"), username));
-            }
-
-            if (applicationName != null) {
-                predicates.add(criteriaBuilder.equal(root.get("application"), applicationName));
-            }
-
-            if (status != null) {
-                predicates.add(criteriaBuilder.equal(root.get("status"), status));
-            }
-
-            if (applicationClass != null) {
-                predicates.add(criteriaBuilder.equal(root.get("applicationClass"), applicationClass));
-            }
-
-            if (startDate != null) {
-                predicates.add(criteriaBuilder.greaterThan(root.get("startedTime"), startDate));
-            }
-
-            if (endDate != null) {
-                predicates.add(criteriaBuilder.lessThan(root.get("startedTime"), endDate));
-            }
-
-            criteriaQuery.where(predicates.toArray(new Predicate[0]));
-            criteriaQuery.orderBy(criteriaBuilder.desc(root.get("startedTime")));
-
-            List<Workflow> list = session.createQuery(criteriaQuery).list();
-            session.getTransaction().commit();
-
-            return list;
-
-        } catch (HibernateException ex) {
-            throw new WorkflowsDBDAOException(ex);
-        }
+        return get(username == null ? null : Collections.singletonList(username),
+                applicationName, status, applicationClass, startDate, endDate, tag);
     }
 
     @Override
     public List<Workflow> get(List<String> usersList, String applicationName,
-            WorkflowStatus status, String applicationClass, Date startDate, Date endDate)
+            WorkflowStatus status, String applicationClass, Date startDate, Date endDate, String tag)
             throws WorkflowsDBDAOException {
 
         try (Session session = sessionFactory.openSession()) {
@@ -265,6 +225,12 @@ public class WorkflowData implements WorkflowDAO {
 
             if (endDate != null) {
                 predicates.add(criteriaBuilder.lessThan(root.get("startedTime"), endDate));
+            }
+
+            if (tag != null) {
+                predicates.add(criteriaBuilder.like(
+                    criteriaBuilder.lower(root.get("tags")),
+                    tag.toLowerCase()));
             }
 
             criteriaQuery.where(predicates.toArray(new Predicate[0]));

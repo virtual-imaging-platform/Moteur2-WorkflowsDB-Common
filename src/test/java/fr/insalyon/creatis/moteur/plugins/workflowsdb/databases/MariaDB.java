@@ -2,6 +2,7 @@ package fr.insalyon.creatis.moteur.plugins.workflowsdb.databases;
 
 import java.sql.SQLException;
 
+import org.testcontainers.DockerClientFactory;
 import org.testcontainers.containers.MariaDBContainer;
 import org.testcontainers.utility.DockerImageName;
 
@@ -20,7 +21,6 @@ public class MariaDB extends Database {
                 stmt.execute("ALTER DATABASE " + mariadb.getDatabaseName() + " CHARACTER SET latin1;");
             }
         }
-
         schema = mariadb.getDatabaseName();
         driverClass = "org.mariadb.jdbc.Driver";
         url = mariadb.getJdbcUrl();
@@ -33,5 +33,10 @@ public class MariaDB extends Database {
     @Override
     public void delete() {
         mariadb.stop();
+    }
+
+    @Override
+    public boolean isAvailable() {
+        return DockerClientFactory.instance().isDockerAvailable();
     }
 }

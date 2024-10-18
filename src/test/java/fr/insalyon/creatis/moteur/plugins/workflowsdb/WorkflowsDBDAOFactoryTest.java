@@ -9,6 +9,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.sql.SQLException;
 import java.time.Instant;
 import java.util.Date;
+import java.util.List;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.junit.jupiter.api.AfterAll;
@@ -33,21 +35,19 @@ import fr.insalyon.creatis.moteur.plugins.workflowsdb.dao.StatsDAO;
 import fr.insalyon.creatis.moteur.plugins.workflowsdb.dao.WorkflowDAO;
 import fr.insalyon.creatis.moteur.plugins.workflowsdb.dao.WorkflowsDBDAOException;
 import fr.insalyon.creatis.moteur.plugins.workflowsdb.dao.WorkflowsDBDAOFactory;
-import fr.insalyon.creatis.moteur.plugins.workflowsdb.databases.H2;
-import fr.insalyon.creatis.moteur.plugins.workflowsdb.databases.MariaDB;
 
 public class WorkflowsDBDAOFactoryTest {
 
     private WorkflowsDBDAOFactory   factory;
-
-    static Database[] databases = { new H2(), new MariaDB() };
+    static List<Database> databases;
 
     static Stream<Database> setups() {
-        return Stream.of(databases);
+        return databases.stream();
     }
 
     @BeforeAll
     static void startDBs() throws SQLException {
+        databases = Database.list().stream().filter((e) -> e.isAvailable()).collect(Collectors.toList());
         for (Database db : databases) {
             db.create();
         }
@@ -171,7 +171,8 @@ public class WorkflowsDBDAOFactoryTest {
             "superscanner",
             "0.1",
             "scannersdesyeux",
-            "MoteurLitePro");
+            "MoteurLitePro",
+            "tag");
 
         Workflow test2 = new Workflow("flowwork", "pasmoi", 
             WorkflowStatus.Unknown, 
@@ -181,7 +182,8 @@ public class WorkflowsDBDAOFactoryTest {
             "superscanner",
             "0.1",
             "scannersdesyeux",
-            "MoteurLitePro");
+            "MoteurLitePro",
+            "tag");
         
         // public void add(Workflow workflow)
         dao.add(test);
@@ -195,7 +197,7 @@ public class WorkflowsDBDAOFactoryTest {
         // others gets except the one with userList (too complex)
         assertEquals(2, dao.get().size());
         assertEquals(1, dao.get(test.getUsername(), dateBetween).size());
-        assertEquals(1, dao.get(test.getUsername(), test.getApplication(), test.getStatus(), test.getApplicationClass(), dateABefore, dateB).size());
+        assertEquals(1, dao.get(test.getUsername(), test.getApplication(), test.getStatus(), test.getApplicationClass(), dateABefore, dateB, "tag").size());
         assertEquals(1, dao.getByUsername(test2.getUsername()).size());
 
         test.setStatus(WorkflowStatus.Running);

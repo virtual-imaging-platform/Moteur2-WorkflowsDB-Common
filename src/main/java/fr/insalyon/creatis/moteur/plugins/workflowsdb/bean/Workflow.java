@@ -74,13 +74,14 @@ public class Workflow {
     private String applicationVersion;
     private String applicationClass;
     private String engine;
+    private String tags;
 
     public Workflow() {
     }
 
     public Workflow(String id, String username, WorkflowStatus status,
             Date startedTime, Date finishedTime, String description,
-            String application, String applicationVersion, String applicationClass, String engine) {
+            String application, String applicationVersion, String applicationClass, String engine, String tags) {
 
         this.id = id;
         this.username = username;
@@ -92,6 +93,7 @@ public class Workflow {
         this.applicationVersion = applicationVersion;
         this.applicationClass = applicationClass;
         this.engine = engine;
+        this.tags = tags;
     }
 
     @Id
@@ -187,6 +189,15 @@ public class Workflow {
     public void setEngine(String engine) {
         this.engine = engine;
     }
+
+    @Column(name = "tags")
+    public String getTags() {
+        return tags;
+    }
+
+    public void setTags(String tags) {
+        this.tags = tags;
+    }
     
     public String toString(){
       return "id: "+id+
@@ -198,7 +209,8 @@ public class Workflow {
              ", application: "+application+
              ", applicationVersion: "+applicationVersion+
              ", applicationClass: "+applicationClass+
-             ", engine: "+engine;
+             ", engine: "+engine+
+             ", tags: "+tags;
     }
     
 }
