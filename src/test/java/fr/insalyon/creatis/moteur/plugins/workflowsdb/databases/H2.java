@@ -11,7 +11,7 @@ import fr.insalyon.creatis.moteur.plugins.workflowsdb.Database;
 public class H2 extends Database {
 
     @Override
-    public void create() {
+    public void initProperties() {
         source = new JdbcDataSource();
         source.setUrl("jdbc:h2:mem:test;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=TRUE");
         source.setUser("test");
@@ -29,7 +29,6 @@ public class H2 extends Database {
                 stmt.execute("CREATE SCHEMA IF NOT EXISTS " + schema);
             }
         } catch (SQLException e) {}
-        super.create();
     }
 
     @Override

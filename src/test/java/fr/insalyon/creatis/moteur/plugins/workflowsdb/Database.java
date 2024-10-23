@@ -35,8 +35,10 @@ public abstract class Database {
 
     public abstract void    delete();
     public abstract boolean isAvailable();
+    public abstract void    initProperties();
 
     public void create() {
+        initProperties();
         MockitoAnnotations.openMocks(this);
 
         when(mockConfig.getSchema()).thenReturn(getSchema());

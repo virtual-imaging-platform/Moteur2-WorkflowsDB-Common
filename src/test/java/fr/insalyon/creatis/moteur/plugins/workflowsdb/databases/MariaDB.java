@@ -13,7 +13,7 @@ public class MariaDB extends Database {
     public MariaDBContainer<?> mariadb = new MariaDBContainer<>(DockerImageName.parse("mariadb:11.5-ubi"));
 
     @Override
-    public void create() {
+    public void initProperties() {
         mariadb.start();
         
         try (var connection = mariadb.createConnection("")) {
@@ -27,7 +27,6 @@ public class MariaDB extends Database {
         dialect = "org.hibernate.dialect.MySQLDialect";
         user = mariadb.getUsername();
         password = mariadb.getPassword();
-        super.create();
     }
 
     @Override
