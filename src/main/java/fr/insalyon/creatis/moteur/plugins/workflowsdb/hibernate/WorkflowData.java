@@ -36,6 +36,8 @@ import fr.insalyon.creatis.moteur.plugins.workflowsdb.bean.Workflow;
 import fr.insalyon.creatis.moteur.plugins.workflowsdb.bean.WorkflowStatus;
 import fr.insalyon.creatis.moteur.plugins.workflowsdb.dao.WorkflowDAO;
 import fr.insalyon.creatis.moteur.plugins.workflowsdb.dao.WorkflowsDBDAOException;
+
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import org.hibernate.Criteria;
@@ -43,6 +45,7 @@ import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.criterion.Junction;
+import org.hibernate.criterion.MatchMode;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 
@@ -189,48 +192,16 @@ public class WorkflowData implements WorkflowDAO {
 
     @Override
     public List<Workflow> get(String username, String applicationName,
-            WorkflowStatus status, String applicationClass, Date startDate, Date endDate)
+            WorkflowStatus status, String applicationClass, Date startDate, Date endDate, String tag)
             throws WorkflowsDBDAOException {
 
-        try {
-            Session session = sessionFactory.openSession();
-            session.beginTransaction();
-            Criteria criteria = session.createCriteria(Workflow.class);
-
-            if (username != null) {
-                criteria.add(Restrictions.eq("username", username));
-            }
-            if (applicationName != null) {
-                criteria.add(Restrictions.eq("application", applicationName));
-            }
-            if (status != null) {
-                criteria.add(Restrictions.eq("status", status));
-            }
-            if (applicationClass != null) {
-                criteria.add(Restrictions.eq("applicationClass", applicationClass));
-            }
-            if (startDate != null) {
-                criteria.add(Restrictions.ge("startedTime", startDate));
-            }
-            if (endDate != null) {
-                criteria.add(Restrictions.le("startedTime", endDate));
-            }
-            criteria.addOrder(Order.desc("startedTime"));
-
-            List<Workflow> list = (List<Workflow>) criteria.list();
-            session.getTransaction().commit();
-            session.close();
-
-            return list;
-
-        } catch (HibernateException ex) {
-            throw new WorkflowsDBDAOException(ex);
-        }
+        return get(username == null ? null : Collections.singletonList(username),
+                applicationName, status, applicationClass, startDate, endDate, tag);
     }
 
     @Override
     public List<Workflow> get(List<String> usersList, String applicationName,
-            WorkflowStatus status, String applicationClass, Date startDate, Date endDate)
+            WorkflowStatus status, String applicationClass, Date startDate, Date endDate, String tag)
             throws WorkflowsDBDAOException {
 
         try {
@@ -238,7 +209,9 @@ public class WorkflowData implements WorkflowDAO {
             session.beginTransaction();
             Criteria criteria = session.createCriteria(Workflow.class);
 
-            if (usersList != null && !usersList.isEmpty()) {
+            if (usersList != null && usersList.size() == 1) {
+                criteria.add(Restrictions.eq("username", usersList.get(0)));
+            } else if (usersList != null && ! usersList.isEmpty()) {
                 Junction junction = Restrictions.disjunction();
                 for (String username : usersList) {
                     junction.add(Restrictions.eq("username", username));
@@ -259,6 +232,9 @@ public class WorkflowData implements WorkflowDAO {
             }
             if (endDate != null) {
                 criteria.add(Restrictions.le("startedTime", endDate));
+            }
+            if (tag != null) {
+                criteria.add(Restrictions.ilike("tags", tag, MatchMode.ANYWHERE));
             }
             criteria.addOrder(Order.desc("startedTime"));
 
