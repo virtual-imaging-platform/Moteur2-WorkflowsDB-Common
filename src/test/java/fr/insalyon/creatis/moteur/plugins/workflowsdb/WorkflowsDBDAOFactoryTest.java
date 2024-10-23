@@ -10,6 +10,7 @@ import java.sql.SQLException;
 import java.time.Instant;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collector;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -47,17 +48,16 @@ public class WorkflowsDBDAOFactoryTest {
 
     @BeforeAll
     static void startDBs() throws SQLException {
-        databases = Database.list().stream().filter((e) -> e.isAvailable()).collect(Collectors.toList());
-        for (Database db : databases) {
-            db.create();
-        }
+        databases = Database.list().stream()
+            .filter(Database::isAvailable)
+            .collect(Collectors.toList());
+
+        databases.forEach(Database::create);
     }
 
     @AfterAll
     static void stopDBs() {
-        for (Database db : databases) {
-            db.delete();
-        }
+        databases.forEach(Database::delete);
     }
 
     @ParameterizedTest @MethodSource("setups")

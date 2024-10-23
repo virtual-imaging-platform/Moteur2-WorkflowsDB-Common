@@ -13,14 +13,14 @@ public class MariaDB extends Database {
     public MariaDBContainer<?> mariadb = new MariaDBContainer<>(DockerImageName.parse("mariadb:11.5-ubi"));
 
     @Override
-    public void create() throws SQLException {
+    public void create() {
         mariadb.start();
         
         try (var connection = mariadb.createConnection("")) {
             try (var stmt = connection.createStatement()) {
                 stmt.execute("ALTER DATABASE " + mariadb.getDatabaseName() + " CHARACTER SET latin1;");
             }
-        }
+        } catch (SQLException e) { }
         schema = mariadb.getDatabaseName();
         driverClass = "org.mariadb.jdbc.Driver";
         url = mariadb.getJdbcUrl();

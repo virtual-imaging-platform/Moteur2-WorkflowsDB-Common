@@ -36,7 +36,7 @@ public abstract class Database {
     public abstract void    delete();
     public abstract boolean isAvailable();
 
-    public void create() throws SQLException {
+    public void create() {
         MockitoAnnotations.openMocks(this);
 
         when(mockConfig.getSchema()).thenReturn(getSchema());
