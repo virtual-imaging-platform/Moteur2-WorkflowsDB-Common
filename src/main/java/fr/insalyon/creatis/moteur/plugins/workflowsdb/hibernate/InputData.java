@@ -35,7 +35,9 @@ package fr.insalyon.creatis.moteur.plugins.workflowsdb.hibernate;
 import fr.insalyon.creatis.moteur.plugins.workflowsdb.bean.Input;
 import fr.insalyon.creatis.moteur.plugins.workflowsdb.dao.InputDAO;
 import fr.insalyon.creatis.moteur.plugins.workflowsdb.dao.WorkflowsDBDAOException;
+
 import java.util.List;
+
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -56,12 +58,10 @@ public class InputData implements InputDAO {
     @Override
     public void add(Input input) throws WorkflowsDBDAOException {
 
-        try {
-            Session session = sessionFactory.openSession();
+        try (Session session = sessionFactory.openSession()) {
             session.beginTransaction();
-            session.saveOrUpdate(input);
+            session.merge(input);
             session.getTransaction().commit();
-            session.close();
 
         } catch (HibernateException ex) {
             throw new WorkflowsDBDAOException(ex);
@@ -71,17 +71,14 @@ public class InputData implements InputDAO {
     @Override
     public List<Input> get(String workflowID) throws WorkflowsDBDAOException {
 
-        try {
-            Session session = sessionFactory.openSession();
+        try (Session session = sessionFactory.openSession()) {
             session.beginTransaction();
-            List<Input> list = (List<Input>) session.getNamedQuery("Inputs.findById")
-                    .setString("workflowID", workflowID)
+            List<Input> list = session.createNamedQuery("Inputs.findById", Input.class)
+                    .setParameter("workflowID", workflowID)
                     .list();
             session.getTransaction().commit();
-            session.close();
 
             return list;
-
         } catch (HibernateException ex) {
             throw new WorkflowsDBDAOException(ex);
         }
@@ -90,14 +87,12 @@ public class InputData implements InputDAO {
     @Override
     public void removeById(String workflowID) throws WorkflowsDBDAOException {
 
-        try {
-            Session session = sessionFactory.openSession();
+        try (Session session = sessionFactory.openSession()) {
             session.beginTransaction();
-            session.getNamedQuery("Inputs.deleteById")
-                    .setString("workflowID", workflowID)
+            session.createNamedQuery("Inputs.deleteById")
+                    .setParameter("workflowID", workflowID)
                     .executeUpdate();
             session.getTransaction().commit();
-            session.close();
 
         } catch (HibernateException ex) {
             throw new WorkflowsDBDAOException(ex);
