@@ -35,6 +35,7 @@ package fr.insalyon.creatis.moteur.plugins.workflowsdb.hibernate;
 import fr.insalyon.creatis.moteur.plugins.workflowsdb.bean.Processor;
 import fr.insalyon.creatis.moteur.plugins.workflowsdb.dao.ProcessorDAO;
 import fr.insalyon.creatis.moteur.plugins.workflowsdb.dao.WorkflowsDBDAOException;
+
 import java.util.List;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
@@ -56,12 +57,10 @@ public class ProcessorData implements ProcessorDAO {
     @Override
     public void add(Processor processor) throws WorkflowsDBDAOException {
 
-        try {
-            Session session = sessionFactory.openSession();
+        try (Session session = sessionFactory.openSession()) {
             session.beginTransaction();
-            session.saveOrUpdate(processor);
+            session.merge(processor);
             session.getTransaction().commit();
-            session.close();
 
         } catch (HibernateException ex) {
             throw new WorkflowsDBDAOException(ex);
@@ -71,12 +70,10 @@ public class ProcessorData implements ProcessorDAO {
     @Override
     public void update(Processor processor) throws WorkflowsDBDAOException {
 
-        try {
-            Session session = sessionFactory.openSession();
+        try (Session session = sessionFactory.openSession()) {
             session.beginTransaction();
             session.merge(processor);
             session.getTransaction().commit();
-            session.close();
 
         } catch (HibernateException ex) {
             throw new WorkflowsDBDAOException(ex);
@@ -86,33 +83,28 @@ public class ProcessorData implements ProcessorDAO {
     @Override
     public void remove(Processor processor) throws WorkflowsDBDAOException {
 
-        try {
-            Session session = sessionFactory.openSession();
+        try (Session session = sessionFactory.openSession()) {
             session.beginTransaction();
-            session.delete(processor);
+            session.remove(processor);
             session.getTransaction().commit();
-            session.close();
 
         } catch (HibernateException ex) {
             throw new WorkflowsDBDAOException(ex);
         }
     }
-    
+
     @Override
     public Processor get(String workflowID, String processor) throws WorkflowsDBDAOException {
 
-        try {
-            Session session = sessionFactory.openSession();
+        try (Session session = sessionFactory.openSession()) {
             session.beginTransaction();
-            Processor p = (Processor) session.getNamedQuery("Processors.findByIdAndProcessor")
-                    .setString("workflowID", workflowID)
-                    .setString("processor", processor)
+            Processor p = session.createNamedQuery("Processors.findByIdAndProcessor", Processor.class)
+                    .setParameter("workflowID", workflowID)
+                    .setParameter("processor", processor)
                     .uniqueResult();
             session.getTransaction().commit();
-            session.close();
 
             return p;
-
         } catch (HibernateException ex) {
             throw new WorkflowsDBDAOException(ex);
         }
@@ -121,17 +113,14 @@ public class ProcessorData implements ProcessorDAO {
     @Override
     public List<Processor> get(String workflowID) throws WorkflowsDBDAOException {
 
-        try {
-            Session session = sessionFactory.openSession();
+        try (Session session = sessionFactory.openSession()) {
             session.beginTransaction();
-            List<Processor> list = (List<Processor>) session.getNamedQuery("Processors.findById")
-                    .setString("workflowID", workflowID)
+            List<Processor> list = session.createNamedQuery("Processors.findById", Processor.class)
+                    .setParameter("workflowID", workflowID)
                     .list();
             session.getTransaction().commit();
-            session.close();
 
             return list;
-
         } catch (HibernateException ex) {
             throw new WorkflowsDBDAOException(ex);
         }
@@ -140,14 +129,12 @@ public class ProcessorData implements ProcessorDAO {
     @Override
     public void removeById(String workflowID) throws WorkflowsDBDAOException {
 
-        try {
-            Session session = sessionFactory.openSession();
+        try (Session session = sessionFactory.openSession()) {
             session.beginTransaction();
-            session.getNamedQuery("Processors.removeById")
-                    .setString("workflowID", workflowID)
+            session.createNamedQuery("Processors.removeById")
+                    .setParameter("workflowID", workflowID)
                     .executeUpdate();
             session.getTransaction().commit();
-            session.close();
 
         } catch (HibernateException ex) {
             throw new WorkflowsDBDAOException(ex);

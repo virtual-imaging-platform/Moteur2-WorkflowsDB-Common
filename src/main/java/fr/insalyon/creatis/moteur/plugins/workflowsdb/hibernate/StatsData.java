@@ -35,6 +35,7 @@ package fr.insalyon.creatis.moteur.plugins.workflowsdb.hibernate;
 import fr.insalyon.creatis.moteur.plugins.workflowsdb.bean.Stats;
 import fr.insalyon.creatis.moteur.plugins.workflowsdb.dao.StatsDAO;
 import fr.insalyon.creatis.moteur.plugins.workflowsdb.dao.WorkflowsDBDAOException;
+
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -55,12 +56,10 @@ public class StatsData implements StatsDAO {
     @Override
     public void add(Stats stats) throws WorkflowsDBDAOException {
         
-        try {
-            Session session = sessionFactory.openSession();
+        try (Session session = sessionFactory.openSession()) {
             session.beginTransaction();
-            session.saveOrUpdate(stats);
+            session.merge(stats);
             session.getTransaction().commit();
-            session.close();
 
         } catch (HibernateException ex) {
             throw new WorkflowsDBDAOException(ex);
@@ -70,12 +69,10 @@ public class StatsData implements StatsDAO {
     @Override
     public void update(Stats stats) throws WorkflowsDBDAOException {
         
-        try {
-            Session session = sessionFactory.openSession();
+        try (Session session = sessionFactory.openSession()) {
             session.beginTransaction();
             session.merge(stats);
             session.getTransaction().commit();
-            session.close();
 
         } catch (HibernateException ex) {
             throw new WorkflowsDBDAOException(ex);
@@ -85,12 +82,10 @@ public class StatsData implements StatsDAO {
     @Override
     public void remove(Stats stats) throws WorkflowsDBDAOException {
         
-        try {
-            Session session = sessionFactory.openSession();
+        try (Session session = sessionFactory.openSession()) {
             session.beginTransaction();
-            session.delete(stats);
+            session.remove(stats);
             session.getTransaction().commit();
-            session.close();
 
         } catch (HibernateException ex) {
             throw new WorkflowsDBDAOException(ex);
@@ -100,14 +95,12 @@ public class StatsData implements StatsDAO {
     @Override
     public void removeById(String workflowID) throws WorkflowsDBDAOException {
 
-        try {
-            Session session = sessionFactory.openSession();
+        try (Session session = sessionFactory.openSession()) {
             session.beginTransaction();
-            session.getNamedQuery("Stats.removeById")
-                    .setString("workflowID", workflowID)
+            session.createNamedQuery("Stats.removeById")
+                    .setParameter("workflowID", workflowID)
                     .executeUpdate();
             session.getTransaction().commit();
-            session.close();
 
         } catch (HibernateException ex) {
             throw new WorkflowsDBDAOException(ex);
@@ -117,14 +110,12 @@ public class StatsData implements StatsDAO {
     @Override
     public Stats get(String workflowID) throws WorkflowsDBDAOException {
         
-        try {
-            Session session = sessionFactory.openSession();
+        try (Session session = sessionFactory.openSession()) {
             session.beginTransaction();
-            Stats stats = (Stats) session.getNamedQuery("Stats.findById")
-                    .setString("workflowID", workflowID)
+            Stats stats = session.createNamedQuery("Stats.findById", Stats.class)
+                    .setParameter("workflowID", workflowID)
                     .uniqueResult();
             session.getTransaction().commit();
-            session.close();
 
             return stats;
 

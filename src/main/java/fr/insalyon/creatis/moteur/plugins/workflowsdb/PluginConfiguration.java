@@ -51,7 +51,7 @@ public class PluginConfiguration {
     private String driverClass;
     private String url;
 
-    public static PluginConfiguration getInstance() throws Exception {
+    public static PluginConfiguration getInstance() throws WorkflowsDBException {
 
         if (instance == null) {
             instance = new PluginConfiguration();
@@ -113,5 +113,13 @@ public class PluginConfiguration {
 
     public String getUrl() {
         return url;
+    }
+
+    public String getHbm2ddl() {
+        return "verify";
+    }
+
+    public String getShowSql() {
+        return "false";
     }
 }
