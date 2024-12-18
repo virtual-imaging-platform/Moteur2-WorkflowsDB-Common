@@ -3,7 +3,7 @@
 
     <groupId>fr.insalyon.creatis</groupId>
     <artifactId>moteur2-workflowsdb-common</artifactId>
-    <version>1.8.0-SNAPSHOT</version>
+    <version>${revision}${sha1}${changelist}</version>
     <packaging>jar</packaging>
 
     <name>Moteur2-WorkflowsDB-Common</name>
@@ -11,6 +11,9 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.target>21</maven.compiler.target>
         <maven.compiler.source>21</maven.compiler.source>
+        <revision>1.8.0</revision>
+        <changelist>-SNAPSHOT</changelist>
+        <sha1 />
     </properties>
 
     <build>
