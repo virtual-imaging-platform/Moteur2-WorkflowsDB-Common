@@ -116,7 +116,7 @@ public class PluginConfiguration {
     }
 
     public String getHbm2ddl() {
-        return "verify";
+        return "validate";
     }
 
     public String getShowSql() {
