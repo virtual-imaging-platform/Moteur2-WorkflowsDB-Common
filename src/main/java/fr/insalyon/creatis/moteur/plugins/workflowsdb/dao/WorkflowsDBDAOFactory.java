@@ -69,6 +69,7 @@ public class WorkflowsDBDAOFactory {
         try {
 
             Configuration cfg = new Configuration();
+
             cfg.setProperty("hibernate.default_schema", conf.getSchema());
             cfg.setProperty("hibernate.connection.driver_class", conf.getDriverClass());
             cfg.setProperty("hibernate.connection.url", conf.getUrl());

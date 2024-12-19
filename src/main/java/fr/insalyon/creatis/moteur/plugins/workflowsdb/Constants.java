@@ -44,4 +44,6 @@ public class Constants {
     public static final String LAB_SCHEMA = "moteur2.plugins.workflowsdb.schema";
     public static final String LAB_URL = "moteur2.plugins.workflowsdb.connection.url";
     public static final String LAB_USER = "moteur2.plugins.workflowsdb.connection.username";
+    public static final String LAB_HBM2DDL = "moteur2.plugins.workflowsdb.connection.hbm2ddl";
+    public static final String LAB_SHOW_SQL = "moteur2.plugins.workflowsdb.connection.show_sql";
 }
