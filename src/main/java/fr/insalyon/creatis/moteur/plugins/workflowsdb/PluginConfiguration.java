@@ -50,6 +50,8 @@ public class PluginConfiguration {
     private String dialect;
     private String driverClass;
     private String url;
+    private String hbm2ddl;
+    private String showSql;
 
     public static PluginConfiguration getInstance() throws WorkflowsDBException {
 
@@ -74,6 +76,8 @@ public class PluginConfiguration {
             dialect = config.getString(Constants.LAB_DIALECT, "org.hibernate.dialect.MySQLDialect");
             driverClass = config.getString(Constants.LAB_DRIVER_CLASS, "com.mysql.jdbc.Driver");
             url = config.getString(Constants.LAB_URL, "jdbc:mysql://localhost:3306/" + schema);
+            hbm2ddl = config.getString(Constants.LAB_SHOW_SQL, "validate");
+            showSql = config.getString(Constants.LAB_SHOW_SQL, "false");
 
             config.setProperty(Constants.LAB_SCHEMA, schema);
             config.setProperty(Constants.LAB_USER, user);
@@ -81,6 +85,8 @@ public class PluginConfiguration {
             config.setProperty(Constants.LAB_DIALECT, dialect);
             config.setProperty(Constants.LAB_DRIVER_CLASS, driverClass);
             config.setProperty(Constants.LAB_URL, url);
+            config.setProperty(Constants.LAB_HBM2DDL, hbm2ddl);
+            config.setProperty(Constants.LAB_SHOW_SQL, showSql);
 
             config.save();
 
@@ -116,10 +122,10 @@ public class PluginConfiguration {
     }
 
     public String getHbm2ddl() {
-        return "validate";
+        return hbm2ddl;
     }
 
     public String getShowSql() {
-        return "false";
+        return showSql;
     }
 }
