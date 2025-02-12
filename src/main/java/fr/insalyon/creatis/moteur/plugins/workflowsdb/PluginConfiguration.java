@@ -74,7 +74,7 @@ public class PluginConfiguration {
             user = config.getString(Constants.LAB_USER, "workflowsdb");
             password = config.getString(Constants.LAB_PASSWORD, "workflowsdb");
             dialect = config.getString(Constants.LAB_DIALECT, "org.hibernate.dialect.MySQLDialect");
-            driverClass = config.getString(Constants.LAB_DRIVER_CLASS, "com.mysql.jdbc.Driver");
+            driverClass = config.getString(Constants.LAB_DRIVER_CLASS, "org.mariadb.jdbc.Driver");
             url = config.getString(Constants.LAB_URL, "jdbc:mysql://localhost:3306/" + schema);
             hbm2ddl = config.getString(Constants.LAB_HBM2DDL, "validate");
             showSql = config.getString(Constants.LAB_SHOW_SQL, "false");
