@@ -57,7 +57,7 @@ public interface WorkflowDAO {
 
     public List<Workflow> get(String username, String applicationName, WorkflowStatus status, String applicationClass, Date startDate, Date endDate, String tag) throws WorkflowsDBDAOException;
     
-    public List<Workflow> get(List<String> usersList, String applicationName, WorkflowStatus status, String applicationClass, Date startDate, Date endDate, String tag) throws WorkflowsDBDAOException;
+    public List<Workflow> get(List<String> usersList, List<String> applications, WorkflowStatus status, String applicationClass, Date startDate, Date endDate, String tag) throws WorkflowsDBDAOException;
 
     public List<Workflow> getByUsername(String username) throws WorkflowsDBDAOException;
 
