@@ -186,12 +186,14 @@ public class WorkflowData implements WorkflowDAO {
             WorkflowStatus status, String applicationClass, Date startDate, Date endDate, String tag)
             throws WorkflowsDBDAOException {
 
-        return get(username == null ? null : Collections.singletonList(username),
-                applicationName, status, applicationClass, startDate, endDate, tag);
+        List<String> users = username == null ? null : Collections.singletonList(username);
+        List<String> applications = applicationName == null ? null : Collections.singletonList(applicationName);
+
+        return get(users, applications, status, applicationClass, startDate, endDate, tag);
     }
 
     @Override
-    public List<Workflow> get(List<String> usersList, String applicationName,
+    public List<Workflow> get(List<String> usersList,  List<String> applications,
             WorkflowStatus status, String applicationClass, Date startDate, Date endDate, String tag)
             throws WorkflowsDBDAOException {
 
@@ -207,8 +209,8 @@ public class WorkflowData implements WorkflowDAO {
                 predicates.add(root.get("username").in(usersList));
             }
 
-            if (applicationName != null) {
-                predicates.add(criteriaBuilder.equal(root.get("application"), applicationName));
+            if (applications != null && !applications.isEmpty()) {
+                predicates.add(root.get("application").in(applications));
             }
 
             if (status != null) {
