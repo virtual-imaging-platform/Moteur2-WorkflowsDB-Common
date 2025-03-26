@@ -3,10 +3,18 @@
 
     <groupId>fr.insalyon.creatis</groupId>
     <artifactId>moteur2-workflowsdb-common</artifactId>
-    <version>1.7.0</version>
+    <version>${revision}${sha1}${changelist}</version>
     <packaging>jar</packaging>
 
     <name>Moteur2-WorkflowsDB-Common</name>
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <maven.compiler.target>21</maven.compiler.target>
+        <maven.compiler.source>21</maven.compiler.source>
+        <revision>2.0.0</revision>
+        <changelist/>
+        <sha1 />
+    </properties>
 
     <build>
         <plugins>
@@ -14,32 +22,16 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>3.0</version>
-                <configuration>
-                    <source>11</source>
-                    <target>11</target>
-                </configuration>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-scm-plugin</artifactId>
-                <version>1.8.1</version>
-                <configuration>
-                    <connectionType>developerConnection</connectionType>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-release-plugin</artifactId>
-                <version>2.4</version>
-                <configuration>
-                    <tagBase>svn+ssh://svn.creatis.insa-lyon.fr/Moteur2-WorkflowsDB-Common/tags</tagBase>
-                </configuration>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>3.5.1</version>
             </plugin>
         </plugins>
     </build>
 
     <dependencies>
-        
         <dependency>
             <groupId>commons-configuration</groupId>
             <artifactId>commons-configuration</artifactId>
@@ -48,18 +40,51 @@
         
         <dependency>
             <groupId>org.hibernate</groupId>
-            <artifactId>hibernate-entitymanager</artifactId>
-            <version>4.1.1.Final</version>
+            <artifactId>hibernate-core</artifactId>
+            <version>6.6.0.Final</version>
         </dependency>
 
-        <!-- It should not be necessary as the mariadb connector should be used in project depending on workflowsdb-common >
         <dependency>
-            <groupId>mysql</groupId>
-            <artifactId>mysql-connector-java</artifactId>
-            <version>8.0.28</version>
+            <groupId>org.mariadb.jdbc</groupId>
+            <artifactId>mariadb-java-client</artifactId>
+            <version>3.4.1</version>
+            <scope>test</scope>
         </dependency>
-        </-->
 
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter</artifactId>
+            <version>5.11.0</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-junit-jupiter</artifactId>
+            <version>5.13.0</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+            <version>2.3.232</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>1.18.34</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.testcontainers</groupId>
+            <artifactId>mariadb</artifactId>
+            <version>1.20.1</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
     <repositories>
@@ -82,6 +107,5 @@
             <name>Internal Snapshots</name>
             <url>https://vip.creatis.insa-lyon.fr:9007/nexus/repository/snapshots</url>
         </snapshotRepository>
-
     </distributionManagement>
 </project>
