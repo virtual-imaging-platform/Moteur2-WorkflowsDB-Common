@@ -11,7 +11,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.target>21</maven.compiler.target>
         <maven.compiler.source>21</maven.compiler.source>
-        <revision>2.0.0</revision>
+        <revision>2.1.0</revision>
         <changelist/>
         <sha1 />
     </properties>
