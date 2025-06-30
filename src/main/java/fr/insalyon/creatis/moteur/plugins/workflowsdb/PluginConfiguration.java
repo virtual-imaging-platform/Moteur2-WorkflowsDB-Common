@@ -33,14 +33,9 @@
 package fr.insalyon.creatis.moteur.plugins.workflowsdb;
 
 import java.io.File;
-import java.io.IOException;
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.PropertiesConfiguration;
 
-/**
- *
- * @author Rafael Ferreira da Silva
- */
 public class PluginConfiguration {
 
     private static PluginConfiguration instance;
@@ -62,37 +57,25 @@ public class PluginConfiguration {
     }
 
     private PluginConfiguration() throws WorkflowsDBException {
-
+        File configFile = new File(System.getProperty("user.home") + "/.moteur2/moteur2plugins.conf");
+        
         try {
-            File configFile = new File(System.getProperty("user.home") + "/.moteur2/moteur2plugins.conf");
-            if (!configFile.exists()) {
-                configFile.createNewFile();
+            if (configFile.exists()) {
+                PropertiesConfiguration config = new PropertiesConfiguration(configFile);
+
+                schema = config.getString(Constants.LAB_SCHEMA, "workflowsdb");
+                user = config.getString(Constants.LAB_USER, "workflowsdb");
+                password = config.getString(Constants.LAB_PASSWORD, "workflowsdb");
+                dialect = config.getString(Constants.LAB_DIALECT, "org.hibernate.dialect.MySQLDialect");
+                driverClass = config.getString(Constants.LAB_DRIVER_CLASS, "org.mariadb.jdbc.Driver");
+                url = config.getString(Constants.LAB_URL, "jdbc:mysql://localhost:3306/" + schema);
+                hbm2ddl = config.getString(Constants.LAB_HBM2DDL, "validate");
+                showSql = config.getString(Constants.LAB_SHOW_SQL, "false");
+            } else {
+                throw new IllegalStateException("Configuration file must be present!");
             }
-            PropertiesConfiguration config = new PropertiesConfiguration(configFile);
-
-            schema = config.getString(Constants.LAB_SCHEMA, "workflowsdb");
-            user = config.getString(Constants.LAB_USER, "workflowsdb");
-            password = config.getString(Constants.LAB_PASSWORD, "workflowsdb");
-            dialect = config.getString(Constants.LAB_DIALECT, "org.hibernate.dialect.MySQLDialect");
-            driverClass = config.getString(Constants.LAB_DRIVER_CLASS, "org.mariadb.jdbc.Driver");
-            url = config.getString(Constants.LAB_URL, "jdbc:mysql://localhost:3306/" + schema);
-            hbm2ddl = config.getString(Constants.LAB_HBM2DDL, "validate");
-            showSql = config.getString(Constants.LAB_SHOW_SQL, "false");
-
-            config.setProperty(Constants.LAB_SCHEMA, schema);
-            config.setProperty(Constants.LAB_USER, user);
-            config.setProperty(Constants.LAB_PASSWORD, password);
-            config.setProperty(Constants.LAB_DIALECT, dialect);
-            config.setProperty(Constants.LAB_DRIVER_CLASS, driverClass);
-            config.setProperty(Constants.LAB_URL, url);
-            config.setProperty(Constants.LAB_HBM2DDL, hbm2ddl);
-            config.setProperty(Constants.LAB_SHOW_SQL, showSql);
-
-            config.save();
 
         } catch (ConfigurationException ex) {
-            throw new WorkflowsDBException(ex);
-        } catch (IOException ex) {
             throw new WorkflowsDBException(ex);
         }
     }
