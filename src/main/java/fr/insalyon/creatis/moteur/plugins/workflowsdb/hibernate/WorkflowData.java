@@ -45,6 +45,7 @@ import java.util.Collections;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.function.Supplier;
 
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
@@ -186,15 +187,79 @@ public class WorkflowData implements WorkflowDAO {
             WorkflowStatus status, String applicationClass, Date startDate, Date endDate, String tag)
             throws WorkflowsDBDAOException {
 
-        List<String> users = username == null ? null : Collections.singletonList(username);
-        List<String> applications = applicationName == null ? null : Collections.singletonList(applicationName);
+        PredicatesProvider predicatesProvider = (
+                criteriaBuilder, root) -> {
+            List<Predicate> predicates = getCommonPredicates(criteriaBuilder, root, status, applicationClass, startDate, endDate, tag);
+            if (username != null) {
+                predicates.add(criteriaBuilder.equal(root.get("username"), username));
+            }
+            if (applicationName != null) {
+                predicates.add(criteriaBuilder.equal(root.get("application"), applicationName));
+            }
+            return predicates;
+        };
 
-        return get(users, applications, status, applicationClass, startDate, endDate, tag);
+        return get(predicatesProvider);
     }
 
     @Override
-    public List<Workflow> get(List<String> usersList,  List<String> applications,
+    public List<Workflow> getWithUserOrApplication(List<String> usersList, List<String> applications,
             WorkflowStatus status, String applicationClass, Date startDate, Date endDate, String tag)
+            throws WorkflowsDBDAOException {
+
+        PredicatesProvider predicatesProvider = (
+                criteriaBuilder, root) -> {
+            List<Predicate> predicates = getCommonPredicates(criteriaBuilder, root, status, applicationClass, startDate, endDate, tag);
+            // if both users and applications, we filter workflow with either 1 of the users OR 1 of the apps
+            if (usersList != null && !usersList.isEmpty() && applications != null && !applications.isEmpty()) {
+                predicates.add(criteriaBuilder.or(
+                        root.get("username").in(usersList),
+                        root.get("application").in(applications)
+                ));
+            } else if (usersList != null && !usersList.isEmpty()) {
+                predicates.add(root.get("username").in(usersList));
+            } else if (applications != null && !applications.isEmpty()) {
+                predicates.add(root.get("application").in(applications));
+            }
+            return predicates;
+        };
+
+        return get(predicatesProvider);
+    }
+
+    private List<Predicate> getCommonPredicates(CriteriaBuilder criteriaBuilder, Root<Workflow> root, WorkflowStatus status, String applicationClass,
+                                                Date startDate, Date endDate, String tag) {
+
+        List<Predicate> predicates = new ArrayList<>();
+        if (status != null) {
+            predicates.add(criteriaBuilder.equal(root.get("status"), status));
+        }
+
+        if (applicationClass != null) {
+            predicates.add(criteriaBuilder.equal(root.get("applicationClass"), applicationClass));
+        }
+
+        if (startDate != null) {
+            predicates.add(criteriaBuilder.greaterThan(root.get("startedTime"), startDate));
+        }
+
+        if (endDate != null) {
+            predicates.add(criteriaBuilder.lessThan(root.get("startedTime"), endDate));
+        }
+
+        if (tag != null) {
+            predicates.add(criteriaBuilder.like(
+                    criteriaBuilder.lower(root.get("tags")),
+                    tag.toLowerCase()));
+        }
+        return predicates;
+    }
+
+    private interface PredicatesProvider {
+        List<Predicate> get(CriteriaBuilder criteriaBuilder, Root<Workflow> root);
+    }
+
+    private List<Workflow> get(PredicatesProvider predicatesProvider)
             throws WorkflowsDBDAOException {
 
         try (Session session = sessionFactory.openSession()) {
@@ -203,37 +268,7 @@ public class WorkflowData implements WorkflowDAO {
             CriteriaBuilder criteriaBuilder = session.getCriteriaBuilder();
             CriteriaQuery<Workflow> criteriaQuery = criteriaBuilder.createQuery(Workflow.class);
             Root<Workflow> root = criteriaQuery.from(Workflow.class);
-            List<Predicate> predicates = new ArrayList<>();
-
-            if (usersList != null && !usersList.isEmpty()) {
-                predicates.add(root.get("username").in(usersList));
-            }
-
-            if (applications != null && !applications.isEmpty()) {
-                predicates.add(root.get("application").in(applications));
-            }
-
-            if (status != null) {
-                predicates.add(criteriaBuilder.equal(root.get("status"), status));
-            }
-
-            if (applicationClass != null) {
-                predicates.add(criteriaBuilder.equal(root.get("applicationClass"), applicationClass));
-            }
-
-            if (startDate != null) {
-                predicates.add(criteriaBuilder.greaterThan(root.get("startedTime"), startDate));
-            }
-
-            if (endDate != null) {
-                predicates.add(criteriaBuilder.lessThan(root.get("startedTime"), endDate));
-            }
-
-            if (tag != null) {
-                predicates.add(criteriaBuilder.like(
-                    criteriaBuilder.lower(root.get("tags")),
-                    tag.toLowerCase()));
-            }
+            List<Predicate> predicates = predicatesProvider.get(criteriaBuilder, root);
 
             criteriaQuery.where(predicates.toArray(new Predicate[0]));
             criteriaQuery.orderBy(criteriaBuilder.desc(root.get("startedTime")));
